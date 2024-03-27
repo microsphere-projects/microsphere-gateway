@@ -14,7 +14,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>Microsphere :: gateway</name>
+    <name>Microsphere :: Gateway</name>
     <description>Microsphere Projects for Gateway</description>
     <url>https://github.com/microsphere-projects/microsphere-gateway</url>
 
@@ -59,6 +59,8 @@
     <modules>
         <module>microsphere-gateway-parent</module>
         <module>microsphere-gateway-dependencies</module>
+        <module>microsphere-spring-cloud-gateway</module>
+        <module>microsphere-spring-cloud-gateway-mvc</module>
     </modules>
 
     <distributionManagement>
