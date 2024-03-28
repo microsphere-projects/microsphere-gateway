@@ -19,8 +19,7 @@ package io.microsphere.spring.cloud.gateway.handler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -30,12 +29,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @since 1.0.0
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        CachingFilteringWebHandlerTest.class
-})
-@TestPropertySource(properties = {
-        "spring.config.additional-location=classpath:/demo.yaml"
-})
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = {
+                CachingFilteringWebHandlerTest.class
+        },
+        properties = {
+                "spring.config.import=classpath:/demo.yaml"
+        }
+)
 @EnableAutoConfiguration
 public class CachingFilteringWebHandlerTest {
 
