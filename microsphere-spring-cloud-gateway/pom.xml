@@ -78,13 +78,14 @@
     </dependencies>
 
     <profiles>
+
+        <!-- Spring Cloud Netflix Eureka -->
         <profile>
-            <id>eureka-client</id>
+            <id>spring-cloud-netflix-eureka</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
-                <!-- Spring Cloud Netflix Eureka Client -->
                 <dependency>
                     <groupId>org.springframework.cloud</groupId>
                     <artifactId>spring-cloud-netflix-eureka-client</artifactId>
@@ -96,13 +97,22 @@
                     <artifactId>eureka-client</artifactId>
                     <scope>test</scope>
                 </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-netflix-eureka-server</artifactId>
+                    <scope>test</scope>
+                </dependency>
             </dependencies>
         </profile>
 
+        <!-- Spring Cloud Nacos -->
         <profile>
-            <id>nacos</id>
+            <id>spring-cloud-alibaba-nacos</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
-                <!-- Spring Cloud Nacos -->
                 <dependency>
                     <groupId>com.alibaba.cloud</groupId>
                     <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -117,10 +127,10 @@
             </dependencies>
         </profile>
 
+        <!-- Spring Cloud Zookeeper -->
         <profile>
-            <id>zookeeper</id>
+            <id>spring-cloud-zookeeper</id>
             <dependencies>
-                <!-- Spring Cloud Zookeeper -->
                 <dependency>
                     <groupId>org.springframework.cloud</groupId>
                     <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
@@ -135,10 +145,10 @@
             </dependencies>
         </profile>
 
+        <!-- Spring Cloud Consul -->
         <profile>
-            <id>consul</id>
+            <id>spring-cloud-consul</id>
             <dependencies>
-                <!-- Spring Cloud Consul -->
                 <dependency>
                     <groupId>org.springframework.cloud</groupId>
                     <artifactId>spring-cloud-starter-consul-discovery</artifactId>
@@ -153,10 +163,10 @@
             </dependencies>
         </profile>
 
+        <!-- Spring Cloud Kubernetes -->
         <profile>
-            <id>kubernetes</id>
+            <id>spring-cloud-kubernetes</id>
             <dependencies>
-                <!-- Spring Cloud Kubernetes -->
                 <dependency>
                     <groupId>org.springframework.cloud</groupId>
                     <artifactId>spring-cloud-starter-kubernetes-client-all</artifactId>
