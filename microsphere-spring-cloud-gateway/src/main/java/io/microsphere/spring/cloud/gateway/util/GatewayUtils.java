@@ -16,7 +16,7 @@
  */
 package io.microsphere.spring.cloud.gateway.util;
 
-import io.microsphere.util.BaseUtils;
+import io.microsphere.util.Utils;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.spring.util.PropertySourcesUtils.getSubProperties;
+import static io.microsphere.spring.core.env.PropertySourcesUtils.getSubProperties;
 import static io.microsphere.util.StringUtils.substringBeforeLast;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -39,7 +39,7 @@ import static java.util.Collections.unmodifiableMap;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-public abstract class GatewayUtils extends BaseUtils {
+public abstract class GatewayUtils implements Utils {
 
     /**
      * Get the flatten properties of {@link GatewayProperties} from the Spring {@link Environment}
@@ -89,5 +89,8 @@ public abstract class GatewayUtils extends BaseUtils {
         }
 
         return unmodifiableMap(routeProperties);
+    }
+
+    private GatewayUtils() {
     }
 }

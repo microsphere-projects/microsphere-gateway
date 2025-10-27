@@ -22,7 +22,6 @@
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-cloud-commons</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>

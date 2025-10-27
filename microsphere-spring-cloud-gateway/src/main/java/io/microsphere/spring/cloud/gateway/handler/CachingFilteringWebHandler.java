@@ -16,7 +16,6 @@
  */
 package io.microsphere.spring.cloud.gateway.handler;
 
-import io.microsphere.invoke.MethodHandleUtils;
 import io.microsphere.spring.cloud.gateway.filter.DefaultGatewayFilterChain;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
@@ -25,7 +24,7 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.handler.FilteringWebHandler;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -36,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 
 import static io.microsphere.invoke.MethodHandleUtils.LookupMode.ALL;
+import static io.microsphere.invoke.MethodHandleUtils.lookup;
 import static io.microsphere.util.ArrayUtils.asArray;
+import static io.microsphere.util.ArrayUtils.combineArray;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
@@ -54,10 +55,9 @@ import static org.springframework.core.annotation.AnnotationAwareOrderComparator
  * @see RefreshRoutesResultEvent
  * @since 1.0.0
  */
-public class CachingFilteringWebHandler extends FilteringWebHandler implements ApplicationListener<RefreshRoutesResultEvent>,
-        DisposableBean {
+public class CachingFilteringWebHandler extends FilteringWebHandler implements DisposableBean {
 
-    private static final MethodHandles.Lookup lookup = MethodHandleUtils.lookup(FilteringWebHandler.class, ALL);
+    private static final MethodHandles.Lookup lookup = lookup(FilteringWebHandler.class, ALL);
 
     private static final MethodHandle globalFiltersMethodHandle;
 
@@ -80,8 +80,8 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements A
         this.globalFilters = resolveGlobalFilters();
     }
 
-    @Override
-    public void onApplicationEvent(RefreshRoutesResultEvent event) {
+    @EventListener(RefreshRoutesResultEvent.class)
+    public void onRefreshRoutesResultEvent(RefreshRoutesResultEvent event) {
         if (matchesEvent(event)) {
             RouteLocator routeLocator = (RouteLocator) event.getSource();
             this.routedGatewayFiltersCache = buildRoutedGatewayFiltersCache(routeLocator);
@@ -106,7 +106,6 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements A
         Map<String, GatewayFilter[]> routedGatewayFiltersCache = new HashMap<>();
         routeLocator.getRoutes().subscribe(route -> {
             String routeId = route.getId();
-            // TODO combinedGatewayFilters to be array ,instead of ArrayList
             GatewayFilter[] combinedGatewayFilters = combineGatewayFilters(route);
             routedGatewayFiltersCache.put(routeId, combinedGatewayFilters);
         }).dispose();
@@ -125,19 +124,8 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements A
 
     private GatewayFilter[] combineGatewayFilters(Route route) {
         GatewayFilter[] globalFilters = getGlobalFilters();
-        List<GatewayFilter> gatewayFilters = route.getFilters();
-        int globalFiltersLength = globalFilters.length;
-        int length = globalFiltersLength + gatewayFilters.size();
-        GatewayFilter[] combinedGatewayFilters = new GatewayFilter[length];
-
-        for (int i = 0; i < globalFiltersLength; i++) {
-            combinedGatewayFilters[i] = globalFilters[i];
-        }
-
-        for (int i = globalFiltersLength, j = 0; i < length; i++) {
-            combinedGatewayFilters[i] = gatewayFilters.get(j++);
-        }
-
+        GatewayFilter[] gatewayFilters = asArray(route.getFilters(), GatewayFilter.class);
+        GatewayFilter[] combinedGatewayFilters = combineArray(globalFilters, gatewayFilters);
         sort(combinedGatewayFilters);
         return combinedGatewayFilters;
     }

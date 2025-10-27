@@ -22,6 +22,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
 /**
  * {@link CachingFilteringWebHandler} Test
  *
@@ -30,12 +32,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        webEnvironment = RANDOM_PORT,
         classes = {
                 CachingFilteringWebHandlerTest.class
-        },
-        properties = {
-                "spring.config.import=classpath:/demo.yaml"
         }
 )
 @EnableAutoConfiguration
@@ -43,6 +42,5 @@ public class CachingFilteringWebHandlerTest {
 
     @Test
     public void test() {
-
     }
 }

@@ -20,7 +20,7 @@ import io.microsphere.spring.cloud.gateway.event.DisabledHeartbeatEventRouteRefr
 import io.microsphere.spring.cloud.gateway.event.PropagatingRefreshRoutesEventApplicationListener;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
 import io.microsphere.spring.cloud.gateway.handler.FilteringWebHandlerBeanDefinitionRegistryPostProcessor;
-import io.microsphere.spring.context.annotation.EnableEventExtension;
+import io.microsphere.spring.context.event.EnableEventExtension;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
