@@ -58,7 +58,6 @@ import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUti
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.util.ArrayUtils.isNotEmpty;
 import static java.net.URI.create;
-import static org.springframework.cloud.gateway.filter.ReactiveLoadBalancerClientFilter.LOAD_BALANCER_CLIENT_FILTER_ORDER;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -74,6 +73,11 @@ import static org.springframework.web.reactive.result.method.RequestMappingInfo.
  */
 public class WebEndpointMappingGlobalFilter implements GlobalFilter, ApplicationListener<RefreshRoutesResultEvent>,
         DisposableBean, Ordered {
+
+    /**
+     * The order of {@link ReactiveLoadBalancerClientFilter#LOAD_BALANCER_CLIENT_FILTER_ORDER}
+     */
+    private static final int LOAD_BALANCER_CLIENT_FILTER_ORDER = 10150;
 
     /**
      * The Web Endpoint scheme of the {@link Route#getUri() Routes' URI}
