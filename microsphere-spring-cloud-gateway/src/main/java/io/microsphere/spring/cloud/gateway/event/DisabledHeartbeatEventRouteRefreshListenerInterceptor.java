@@ -25,9 +25,7 @@ import org.springframework.cloud.gateway.route.RouteRefreshListener;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-import static io.microsphere.util.ArrayUtils.ofArray;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.util.ObjectUtils.containsElement;
 
 /**
  * The {@link ApplicationListenerInterceptor} class to disable {@link RouteRefreshListener RouteRefreshListeners'}
@@ -46,16 +44,13 @@ public class DisabledHeartbeatEventRouteRefreshListenerInterceptor implements Ap
 
     private static final Class<RouteRefreshListener> INTERCEPTED_CLASS = RouteRefreshListener.class;
 
-    private static final Class<?>[] EVENT_CLASSES = ofArray(HeartbeatEvent.class, ParentHeartbeatEvent.class);
-
     @Override
     public void intercept(ApplicationListener<?> applicationListener, ApplicationEvent event, ApplicationListenerInterceptorChain chain) {
         Class<?> listenerClass = applicationListener.getClass();
         Class<?> eventClass = event.getClass();
 
         if (INTERCEPTED_CLASS.equals(listenerClass) && matchesHeartbeatEvent(eventClass)) {
-            logger.debug("The ApplicationListener[class : '{}'] with event[class: '{}'] is disabled",
-                    listenerClass.getName(), eventClass.getName());
+            logger.trace("The ApplicationListener[{}] with event[{}] is disabled", listenerClass, eventClass);
             return;
         }
 
@@ -63,6 +58,6 @@ public class DisabledHeartbeatEventRouteRefreshListenerInterceptor implements Ap
     }
 
     private boolean matchesHeartbeatEvent(Class<?> eventClass) {
-        return containsElement(EVENT_CLASSES, eventClass);
+        return HeartbeatEvent.class.equals(eventClass) || ParentHeartbeatEvent.class.equals(eventClass);
     }
 }
