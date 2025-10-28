@@ -21,6 +21,9 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import static reactor.core.publisher.Mono.defer;
+import static reactor.core.publisher.Mono.empty;
+
 /**
  * Default {@link GatewayFilterChain}
  *
@@ -46,8 +49,8 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
     public Mono<Void> filter(ServerWebExchange exchange) {
         if (position < length) {
             GatewayFilter gatewayFilter = this.gatewayFilters[position++];
-            return Mono.defer(() -> gatewayFilter.filter(exchange, this));
+            return defer(() -> gatewayFilter.filter(exchange, this));
         }
-        return Mono.empty();
+        return empty();
     }
 }

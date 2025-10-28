@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Import;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
 @AutoConfigureAfter(org.springframework.cloud.gateway.config.GatewayAutoConfiguration.class)
-@EnableEventExtension(intercepted = true)
+@EnableEventExtension
 @Import(value = {
         DisabledHeartbeatEventRouteRefreshListenerInterceptor.class,
         PropagatingRefreshRoutesEventApplicationListener.class,

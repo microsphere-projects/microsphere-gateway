@@ -32,6 +32,7 @@ import static io.microsphere.spring.core.env.PropertySourcesUtils.getSubProperti
 import static io.microsphere.util.StringUtils.substringBeforeLast;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
+import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 
 /**
  * The utilities class for Gateway
@@ -49,7 +50,7 @@ public abstract class GatewayUtils implements Utils {
      */
     @NonNull
     public static Map<String, Object> getGatewayProperties(ConfigurableEnvironment environment) {
-        return getSubProperties(environment, GatewayProperties.PREFIX);
+        return getSubProperties(environment, PREFIX);
     }
 
     /**

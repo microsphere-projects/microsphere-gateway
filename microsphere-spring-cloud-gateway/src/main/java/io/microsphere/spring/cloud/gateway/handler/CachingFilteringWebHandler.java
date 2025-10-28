@@ -80,6 +80,7 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
         this.globalFilters = resolveGlobalFilters();
     }
 
+
     @EventListener(RefreshRoutesResultEvent.class)
     public void onRefreshRoutesResultEvent(RefreshRoutesResultEvent event) {
         if (matchesEvent(event)) {

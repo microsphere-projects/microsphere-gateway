@@ -18,15 +18,16 @@ package io.microsphere.spring.cloud.gateway.event;
 
 import io.microsphere.spring.context.event.ApplicationListenerInterceptor;
 import io.microsphere.spring.context.event.ApplicationListenerInterceptorChain;
-import io.microsphere.util.ArrayUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
 import org.springframework.cloud.client.discovery.event.ParentHeartbeatEvent;
 import org.springframework.cloud.gateway.route.RouteRefreshListener;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.util.ObjectUtils;
+
+import static io.microsphere.util.ArrayUtils.ofArray;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.util.ObjectUtils.containsElement;
 
 /**
  * The {@link ApplicationListenerInterceptor} class to disable {@link RouteRefreshListener RouteRefreshListeners'}
@@ -41,11 +42,11 @@ import org.springframework.util.ObjectUtils;
  */
 public class DisabledHeartbeatEventRouteRefreshListenerInterceptor implements ApplicationListenerInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(DisabledHeartbeatEventRouteRefreshListenerInterceptor.class);
+    private static final Logger logger = getLogger(DisabledHeartbeatEventRouteRefreshListenerInterceptor.class);
 
     private static final Class<RouteRefreshListener> INTERCEPTED_CLASS = RouteRefreshListener.class;
 
-    private static final Class<?>[] EVENT_CLASSES = ArrayUtils.of(HeartbeatEvent.class, ParentHeartbeatEvent.class);
+    private static final Class<?>[] EVENT_CLASSES = ofArray(HeartbeatEvent.class, ParentHeartbeatEvent.class);
 
     @Override
     public void intercept(ApplicationListener<?> applicationListener, ApplicationEvent event, ApplicationListenerInterceptorChain chain) {
@@ -62,6 +63,6 @@ public class DisabledHeartbeatEventRouteRefreshListenerInterceptor implements Ap
     }
 
     private boolean matchesHeartbeatEvent(Class<?> eventClass) {
-        return ObjectUtils.containsElement(EVENT_CLASSES, eventClass);
+        return containsElement(EVENT_CLASSES, eventClass);
     }
 }

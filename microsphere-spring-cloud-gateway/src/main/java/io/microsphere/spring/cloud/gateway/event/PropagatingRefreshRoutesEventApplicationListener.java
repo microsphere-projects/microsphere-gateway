@@ -1,12 +1,13 @@
 package io.microsphere.spring.cloud.gateway.event;
 
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
-import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 
 import java.util.Set;
+
+import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 
 /**
  * {@link EnvironmentChangeEvent} {@link ApplicationListener} propagates {@link RefreshRoutesEvent}
@@ -41,7 +42,7 @@ public class PropagatingRefreshRoutesEventApplicationListener implements Applica
     }
 
     private boolean isGatewayPropertyName(String key) {
-        return key != null && key.startsWith(GatewayProperties.PREFIX);
+        return key != null && key.startsWith(PREFIX);
     }
 
 }
