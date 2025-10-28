@@ -36,6 +36,15 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Spring Boot Dependencies -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- Spring Cloud Dependencies -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -72,6 +81,7 @@
         <profile>
             <id>spring-cloud-2022</id>
             <properties>
+                <spring-boot.version>3.0.13</spring-boot.version>
                 <spring-cloud.version>2022.0.5</spring-cloud.version>
                 <spring-cloud-alibaba.version>2022.0.0.2</spring-cloud-alibaba.version>
             </properties>
@@ -80,6 +90,7 @@
         <profile>
             <id>spring-cloud-2023</id>
             <properties>
+                <spring-boot.version>3.3.13</spring-boot.version>
                 <spring-cloud.version>2023.0.6</spring-cloud.version>
                 <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
             </properties>
@@ -88,6 +99,7 @@
         <profile>
             <id>spring-cloud-2024</id>
             <properties>
+                <spring-boot.version>3.4.7</spring-boot.version>
                 <spring-cloud.version>2024.0.2</spring-cloud.version>
                 <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
             </properties>
@@ -99,27 +111,10 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <spring-boot.version>3.5.0</spring-boot.version>
                 <spring-cloud.version>2025.0.0</spring-cloud.version>
                 <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
             </properties>
-        </profile>
-
-        <!-- Testcontainers -->
-        <profile>
-            <id>testcontainers</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <testcontainers.enabled>true</testcontainers.enabled>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
     </profiles>
