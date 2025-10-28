@@ -24,17 +24,17 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Objects;
 
+import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
+import static org.springframework.util.ObjectUtils.isEmpty;
 import static org.springframework.util.StringUtils.tokenizeToStringArray;
 
 /**
@@ -57,7 +57,7 @@ public class WebEndpointMappingGatewayAutoConfiguration {
     public ServiceInstancePredicate serviceInstancePredicate() {
         return (serverWebExchange, serviceInstance) -> {
             String[] paths = tokenizeToStringArray(serverWebExchange.getRequest().getURI().getRawPath(), "/");
-            if (ObjectUtils.isEmpty(paths)) {
+            if (isEmpty(paths)) {
                 return false;
             }
             return Objects.equals(paths[0], serviceInstance.getServiceId().toLowerCase());
@@ -66,7 +66,7 @@ public class WebEndpointMappingGatewayAutoConfiguration {
 
     @Bean
     @ConditionalOnEnabledGlobalFilter
-    @ConditionalOnBean(value = DiscoveryClient.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnBean(value = DiscoveryClient.class, search = CURRENT)
     public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(DiscoveryClient discoveryClient,
                                                                          ObjectProvider<ServiceInstancePredicate> webEndpointServiceInstanceChooseHandler) {
         WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter = new WebEndpointMappingGlobalFilter(discoveryClient);

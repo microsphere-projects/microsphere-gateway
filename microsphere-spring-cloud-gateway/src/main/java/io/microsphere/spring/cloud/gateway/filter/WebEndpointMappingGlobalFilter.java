@@ -91,7 +91,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     public static final String METADATA_KEY = "web-endpoint";
 
     private final DiscoveryClient discoveryClient;
-
     private ServiceInstancePredicate serviceInstancePredicate;
 
     private volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = null;
@@ -302,22 +301,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
         RequestMappingInfo excludeRequestMappingInfo;
 
-        public Exclude getExclude() {
-            return exclude;
-        }
-
-        public void setExclude(Exclude exclude) {
-            this.exclude = exclude;
-        }
-
-        public String getLoadBalancer() {
-            return loadBalancer;
-        }
-
-        public void setLoadBalancer(String loadBalancer) {
-            this.loadBalancer = loadBalancer;
-        }
-
         public void init() {
             Exclude exclude = this.exclude;
             String[] patterns = exclude.patterns;
@@ -338,37 +321,15 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             String[] patterns = null;
 
             RequestMethod[] methods = null;
-
-            public Set<String> getServices() {
-                return services;
-            }
-
-            public void setServices(Set<String> services) {
-                this.services = services;
-            }
-
-            public String[] getPatterns() {
-                return patterns;
-            }
-
-            public void setPatterns(String[] patterns) {
-                this.patterns = patterns;
-            }
-
-            public RequestMethod[] getMethods() {
-                return methods;
-            }
-
-            public void setMethods(RequestMethod[] methods) {
-                this.methods = methods;
-            }
         }
     }
 
     static class RequestMappingContext {
 
         private final RequestMappingInfo requestMappingInfo;
+
         private ServiceInstancePredicate serviceInstancePredicate;
+
         private int id;
 
         private List<ServiceInstance> serviceInstances = new LinkedList<>();
@@ -410,9 +371,9 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             return serviceInstancePredicate.test(exchange, serviceInstance);
         }
 
-       public int compareTo(RequestMappingContext other, ServerWebExchange exchange) {
+        public int compareTo(RequestMappingContext other, ServerWebExchange exchange) {
             return this.requestMappingInfo.compareTo(other.requestMappingInfo, exchange);
-       }
+        }
 
     }
 
