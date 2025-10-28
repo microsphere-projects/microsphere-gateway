@@ -54,8 +54,7 @@ public class DisabledHeartbeatEventRouteRefreshListenerInterceptor implements Ap
         Class<?> eventClass = event.getClass();
 
         if (INTERCEPTED_CLASS.equals(listenerClass) && matchesHeartbeatEvent(eventClass)) {
-            logger.debug("The ApplicationListener[class : '{}'] with event[class: '{}'] is disabled",
-                    listenerClass.getName(), eventClass.getName());
+            logger.trace("The ApplicationListener[{}] with event[{}] is disabled", listenerClass, eventClass);
             return;
         }
 
