@@ -19,8 +19,9 @@
     <description>Microsphere Gateway Parent</description>
 
     <properties>
-        <microsphere-spring-cloud.version>0.1.2</microsphere-spring-cloud.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
+        <!-- BOM versions -->
+        <microsphere-spring-cloud.version>0.2.2</microsphere-spring-cloud.version>
+        <testcontainers.version>2.0.1</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -112,7 +113,6 @@
                 </plugins>
             </build>
         </profile>
-        
-    </profiles>
 
+    </profiles>
 </project>
