@@ -63,7 +63,7 @@ class PropagatingRefreshRoutesEventApplicationListenerTest {
         this.context.addApplicationListener((ApplicationListener<RefreshRoutesEvent>)
                 event -> testValueHolder.setValue(event));
 
-        this.context.publishEvent(new EnvironmentChangeEvent(ofSet(PREFIX + "enabled")));
+        this.context.publishEvent(new EnvironmentChangeEvent(ofSet(PREFIX + ".enabled")));
 
         RefreshRoutesEvent event = testValueHolder.getValue();
         assertSame(this.listener, event.getSource());
