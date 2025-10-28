@@ -22,7 +22,6 @@
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-cloud-commons</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
@@ -60,6 +59,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -76,5 +76,4 @@
         </dependency>
 
     </dependencies>
-
 </project>
