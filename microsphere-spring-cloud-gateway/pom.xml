@@ -26,7 +26,7 @@
 
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-spring-web</artifactId>
+            <artifactId>microsphere-spring-webflux</artifactId>
         </dependency>
 
         <!-- Spring Boot -->
