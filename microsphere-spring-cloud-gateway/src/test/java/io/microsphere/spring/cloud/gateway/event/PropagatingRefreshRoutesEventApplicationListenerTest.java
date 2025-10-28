@@ -32,6 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static io.microsphere.collection.Sets.ofSet;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 
 /**
  * {@link PropagatingRefreshRoutesEventApplicationListener} Test
@@ -62,7 +63,7 @@ class PropagatingRefreshRoutesEventApplicationListenerTest {
         this.context.addApplicationListener((ApplicationListener<RefreshRoutesEvent>)
                 event -> testValueHolder.setValue(event));
 
-        this.context.publishEvent(new EnvironmentChangeEvent(ofSet("spring.cloud.gateway.enabled")));
+        this.context.publishEvent(new EnvironmentChangeEvent(ofSet(PREFIX + ".enabled")));
 
         RefreshRoutesEvent event = testValueHolder.getValue();
         assertSame(this.listener, event.getSource());

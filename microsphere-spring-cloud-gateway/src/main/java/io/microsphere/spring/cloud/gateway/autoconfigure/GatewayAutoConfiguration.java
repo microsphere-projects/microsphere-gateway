@@ -16,13 +16,13 @@
  */
 package io.microsphere.spring.cloud.gateway.autoconfigure;
 
+import io.microsphere.spring.cloud.gateway.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.event.DisabledHeartbeatEventRouteRefreshListenerInterceptor;
 import io.microsphere.spring.cloud.gateway.event.PropagatingRefreshRoutesEventApplicationListener;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
 import io.microsphere.spring.cloud.gateway.handler.FilteringWebHandlerBeanDefinitionRegistryPostProcessor;
 import io.microsphere.spring.context.event.EnableEventExtension;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Import;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
+@ConditionalOnGatewayEnabled
 @AutoConfigureAfter(org.springframework.cloud.gateway.config.GatewayAutoConfiguration.class)
 @EnableEventExtension
 @Import(value = {

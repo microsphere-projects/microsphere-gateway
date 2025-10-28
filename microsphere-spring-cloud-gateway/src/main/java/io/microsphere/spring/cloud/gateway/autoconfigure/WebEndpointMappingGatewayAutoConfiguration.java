@@ -16,6 +16,7 @@
  */
 package io.microsphere.spring.cloud.gateway.autoconfigure;
 
+import io.microsphere.spring.cloud.gateway.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
 import io.microsphere.spring.cloud.gateway.handler.ServiceInstancePredicate;
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
@@ -47,7 +47,7 @@ import static org.springframework.util.StringUtils.tokenizeToStringArray;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnDiscoveryEnabled
-@ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
+@ConditionalOnGatewayEnabled
 @AutoConfigureAfter(GatewayAutoConfiguration.class)
 public class WebEndpointMappingGatewayAutoConfiguration {
 
