@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.microsphere.spring.cloud.gateway.filter;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -21,42 +22,19 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import static io.microsphere.util.ArrayUtils.length;
-import static io.microsphere.util.Assert.assertNoNullElements;
-import static io.microsphere.util.Assert.assertTrue;
-import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 
 /**
- * Default {@link GatewayFilterChain}
+ * No-Op {@link GatewayFilter}
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see GatewayFilterChain
+ * @see GatewayFilter
  * @since 1.0.0
  */
-public class DefaultGatewayFilterChain implements GatewayFilterChain {
-
-    private final GatewayFilter[] gatewayFilters;
-
-    private final int length;
-
-    private int position;
-
-    public DefaultGatewayFilterChain(GatewayFilter... gatewayFilters) {
-        int length = length(gatewayFilters);
-        assertTrue(length != 0, () -> "The 'gatewayFilters' must not be empty");
-        assertNoNullElements(gatewayFilters, "Any element of 'gatewayFilters' must not be null");
-        this.gatewayFilters = gatewayFilters;
-        this.length = length;
-        this.position = 0;
-    }
+public class NoOpGatewayFilter implements GatewayFilter {
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange) {
-        if (position < length) {
-            GatewayFilter gatewayFilter = this.gatewayFilters[position++];
-            return defer(() -> gatewayFilter.filter(exchange, this));
-        }
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         return empty();
     }
 }
