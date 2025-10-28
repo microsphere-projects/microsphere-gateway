@@ -33,9 +33,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Objects;
 
+import static io.microsphere.util.StringUtils.isBlank;
+import static io.microsphere.util.StringUtils.substringBetween;
 import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
-import static org.springframework.util.ObjectUtils.isEmpty;
-import static org.springframework.util.StringUtils.tokenizeToStringArray;
 
 /**
  * Gateway Auto-Configuration for {@link WebEndpointMapping}
@@ -56,11 +56,13 @@ public class WebEndpointMappingGatewayAutoConfiguration {
     @ConditionalOnMissingBean(value = ServiceInstancePredicate.class)
     public ServiceInstancePredicate serviceInstancePredicate() {
         return (serverWebExchange, serviceInstance) -> {
-            String[] paths = tokenizeToStringArray(serverWebExchange.getRequest().getURI().getRawPath(), "/");
-            if (isEmpty(paths)) {
+            String rawPath = serverWebExchange.getRequest().getURI().getRawPath();
+            String basePath = substringBetween(rawPath, "/", "/");
+            if (isBlank(basePath)) {
                 return false;
             }
-            return Objects.equals(paths[0], serviceInstance.getServiceId().toLowerCase());
+            String serviceId = serviceInstance.getServiceId().toLowerCase();
+            return Objects.equals(serviceId, basePath);
         };
     }
 
