@@ -16,10 +16,6 @@
     <name>Microsphere :: Gateway :: Spring Cloud Gateway MVC</name>
     <description>Microsphere Spring Cloud Gateway Server MVC</description>
 
-    <properties>
-        <spring-cloud-gateway.version>4.1.1</spring-cloud-gateway.version>
-    </properties>
-
     <dependencies>
 
         <!-- Microsphere -->
@@ -30,7 +26,7 @@
 
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-spring-web</artifactId>
+            <artifactId>microsphere-spring-webmvc</artifactId>
         </dependency>
 
         <!-- Spring Boot -->
@@ -63,7 +59,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway-mvc</artifactId>
-            <version>${spring-cloud-gateway.version}</version>
         </dependency>
 
         <dependency>
@@ -80,4 +75,16 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <!-- Spring Cloud Profiles -->
+        <profile>
+            <id>spring-cloud-2022</id>
+            <!-- actual : spring-cloud-2023 -->
+            <properties>
+                <spring-boot.version>3.3.13</spring-boot.version>
+                <spring-cloud.version>2023.0.6</spring-cloud.version>
+                <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>
