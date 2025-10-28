@@ -32,9 +32,10 @@ import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabled
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Objects;
+
+import static org.springframework.util.StringUtils.tokenizeToStringArray;
 
 /**
  * Gateway Auto-Configuration for {@link WebEndpointMapping}
@@ -55,7 +56,7 @@ public class WebEndpointMappingGatewayAutoConfiguration {
     @ConditionalOnMissingBean(value = ServiceInstancePredicate.class)
     public ServiceInstancePredicate serviceInstancePredicate() {
         return (serverWebExchange, serviceInstance) -> {
-            String[] paths = StringUtils.tokenizeToStringArray(serverWebExchange.getRequest().getURI().getRawPath(), "/");
+            String[] paths = tokenizeToStringArray(serverWebExchange.getRequest().getURI().getRawPath(), "/");
             if (ObjectUtils.isEmpty(paths)) {
                 return false;
             }

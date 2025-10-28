@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.spring.util.PropertySourcesUtils.getSubProperties;
+import static io.microsphere.spring.core.env.PropertySourcesUtils.getSubProperties;
 import static io.microsphere.util.StringUtils.substringBeforeLast;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;

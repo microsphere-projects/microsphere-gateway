@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
  * @see GatewayFilterChain
  * @since 1.0.0
  */
-public class DefaultGatewayFilterChain implements GatewayFilterChain {
+public class  DefaultGatewayFilterChain implements GatewayFilterChain {
 
     private final GatewayFilter[] gatewayFilters;
 

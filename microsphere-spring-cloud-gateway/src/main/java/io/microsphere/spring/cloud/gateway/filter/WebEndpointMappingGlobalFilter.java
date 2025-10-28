@@ -91,6 +91,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     public static final String METADATA_KEY = "web-endpoint";
 
     private final DiscoveryClient discoveryClient;
+
     private ServiceInstancePredicate serviceInstancePredicate;
 
     private volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = null;
