@@ -75,6 +75,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Microsphere Spring Testing -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-spring-test</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
