@@ -53,6 +53,7 @@ import static io.microsphere.collection.CollectionUtils.isNotEmpty;
 import static io.microsphere.collection.PropertiesUtils.flatProperties;
 import static io.microsphere.constants.PathConstants.SLASH_CHAR;
 import static io.microsphere.constants.SymbolConstants.COLON_CHAR;
+import static io.microsphere.net.URLUtils.buildURI;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
@@ -440,12 +441,13 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         if (isEmpty(metadata)) {
             return path;
         }
-        String contextPath = metadata.get(WEB_CONTEXT_PATH_METADATA_NAME);
-        String servicePath = SLASH_CHAR + serviceInstance.getServiceId().toLowerCase();
-        if (path.startsWith(servicePath)) {
-            return path.replaceFirst(servicePath, contextPath);
+        String servicePath = SLASH_CHAR + serviceInstance.getServiceId().toLowerCase() + SLASH_CHAR;
+        int index = path.indexOf(servicePath, 0);
+        if (index != 0) {
+            return path;
         }
-        return path;
+        String contextPath = metadata.get(WEB_CONTEXT_PATH_METADATA_NAME);
+        return buildURI(contextPath, path.substring(servicePath.length()));
     }
 
     private static RequestMappingInfo buildRequestMappingInfo(WebEndpointMapping webEndpointMapping) {
