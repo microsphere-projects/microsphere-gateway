@@ -56,6 +56,7 @@ import java.util.stream.Stream;
 import static io.microsphere.collection.PropertiesUtils.flatProperties;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
+import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config.DEFAULT_CONFIG;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.util.ArrayUtils.isNotEmpty;
 import static java.net.URI.create;
@@ -203,8 +204,8 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         if (routeId == null) {
             return true;
         }
-        Config config = routedConfigs.get(routeId);
-        return config != null && config.isExcludedRequest(exchange);
+        Config config = routedConfigs.getOrDefault(routeId, DEFAULT_CONFIG);
+        return config.isExcludedRequest(exchange);
     }
 
     @Override
@@ -249,11 +250,11 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     private Config createConfig(Route route) {
-        Config config = new Config();
         Map<String, Object> metadata = route.getMetadata();
         if (isEmpty(metadata)) {
-            return config;
+            return DEFAULT_CONFIG;
         }
+        Config config = new Config();
         Map<String, Object> properties = (Map) metadata.get(METADATA_KEY);
         Map<String, Object> flatProperties = flatProperties(properties);
         ConfigurationBeanBinder beanBinder = new BindableConfigurationBeanBinder();
@@ -296,6 +297,8 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     static class Config {
+
+        static Config DEFAULT_CONFIG = new Config();
 
         Exclude exclude = new Exclude();
 
