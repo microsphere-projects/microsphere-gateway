@@ -16,7 +16,6 @@
  */
 package io.microsphere.spring.cloud.gateway.filter;
 
-import io.microsphere.collection.CollectionUtils;
 import io.microsphere.spring.boot.context.config.BindableConfigurationBeanBinder;
 import io.microsphere.spring.cloud.gateway.handler.ServiceInstancePredicate;
 import io.microsphere.spring.context.config.ConfigurationBeanBinder;
@@ -44,22 +43,27 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static io.microsphere.collection.CollectionUtils.isNotEmpty;
 import static io.microsphere.collection.PropertiesUtils.flatProperties;
+import static io.microsphere.constants.PathConstants.SLASH_CHAR;
+import static io.microsphere.constants.SymbolConstants.COLON_CHAR;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
-import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config.DEFAULT_CONFIG;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.util.ArrayUtils.isNotEmpty;
+import static java.lang.Math.abs;
+import static java.lang.String.valueOf;
 import static java.net.URI.create;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 import static org.springframework.cloud.gateway.filter.ReactiveLoadBalancerClientFilter.LOAD_BALANCER_CLIENT_FILTER_ORDER;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
@@ -96,9 +100,9 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
     private ServiceInstancePredicate serviceInstancePredicate;
 
-    private volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = null;
+    volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = null;
 
-    private volatile Map<String, Config> routedConfigs = null;
+    volatile Map<String, Config> routedConfigs = null;
 
     public WebEndpointMappingGlobalFilter(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
@@ -116,6 +120,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             // NO Web-Endpoint scheme
             return chain.filter(exchange);
         }
+
         RequestMappingContext requestMappingContext = getMatchingRequestMappingContext(exchange);
 
         if (requestMappingContext != null) {
@@ -128,7 +133,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
                 int id = requestMappingContext.id;
                 ServerHttpRequest request = exchange.getRequest()
                         .mutate()
-                        .header(ID_HEADER_NAME, String.valueOf(id)).build();
+                        .header(ID_HEADER_NAME, valueOf(id)).build();
                 exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, targetURI);
                 return chain.filter(exchange.mutate().request(request).build());
             }
@@ -179,7 +184,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             }
         }
         matchesRequestMappings.sort((v1, v2) -> v1.compareTo(v2, newExchange));
-        if (CollectionUtils.isNotEmpty(matchesRequestMappings)) {
+        if (isNotEmpty(matchesRequestMappings)) {
             // matches the request mapping
             target = matchesRequestMappings.get(0);
         }
@@ -204,7 +209,14 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         if (routeId == null) {
             return true;
         }
-        Config config = routedConfigs.getOrDefault(routeId, DEFAULT_CONFIG);
+        Map<String, Config> routedConfigs = this.routedConfigs;
+        if (routedConfigs == null) {
+            return false;
+        }
+        Config config = routedConfigs.get(routeId);
+        if (config == null) {
+            return false;
+        }
         return config.isExcludedRequest(exchange);
     }
 
@@ -227,7 +239,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
                 getSubscribedServices(route, config)
                         .stream()
                         .map(discoveryClient::getInstances)
-                        // TODO Add ZonePreferenceFilter
+                        // TODO support ZonePreferenceFilter
                         .flatMap(List::stream)
                         .forEach(serviceInstance -> {
                             getWebEndpointMappings(serviceInstance)
@@ -249,13 +261,10 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         }
     }
 
-    private Config createConfig(Route route) {
+    Config createConfig(Route route) {
         Map<String, Object> metadata = route.getMetadata();
-        if (isEmpty(metadata)) {
-            return DEFAULT_CONFIG;
-        }
         Config config = new Config();
-        Map<String, Object> properties = (Map) metadata.get(METADATA_KEY);
+        Map<String, Object> properties = (Map) metadata.getOrDefault(METADATA_KEY, emptyMap());
         Map<String, Object> flatProperties = flatProperties(properties);
         ConfigurationBeanBinder beanBinder = new BindableConfigurationBeanBinder();
         beanBinder.bind(flatProperties, true, true, config);
@@ -267,8 +276,8 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         return event.isSuccess() && (event.getSource() instanceof RouteLocator);
     }
 
-    private Collection<String> getSubscribedServices(Route route, Config config) {
-        Set<String> excludedServices = config.exclude.services;
+    Collection<String> getSubscribedServices(Route route, Config config) {
+        Set<String> excludedServices = config.exclude.getServices();
         URI uri = route.getUri();
         String host = uri.getHost();
         final Collection<String> services = new LinkedList<>();
@@ -287,24 +296,38 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     @Override
-    public void destroy() throws Exception {
-        if (routedRequestMappingContexts != null) {
-            routedRequestMappingContexts.clear();
+    public void destroy() {
+        if (this.routedRequestMappingContexts != null) {
+            this.routedRequestMappingContexts.clear();
         }
-        if (routedConfigs != null) {
-            routedConfigs.clear();
+        if (this.routedConfigs != null) {
+            this.routedConfigs.clear();
         }
     }
 
-    static class Config {
+    /**
+     * Clear for testing
+     */
+    void clear() {
+        this.routedRequestMappingContexts = null;
+        this.routedConfigs = null;
+    }
 
-        static Config DEFAULT_CONFIG = new Config();
+    static class Config {
 
         Exclude exclude = new Exclude();
 
         String loadBalancer;
 
         RequestMappingInfo excludeRequestMappingInfo;
+
+        public void setExclude(Exclude exclude) {
+            this.exclude = exclude;
+        }
+
+        public void setLoadBalancer(String loadBalancer) {
+            this.loadBalancer = loadBalancer;
+        }
 
         public void init() {
             Exclude exclude = this.exclude;
@@ -314,18 +337,34 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             }
         }
 
-        public boolean isExcludedRequest(ServerWebExchange exchange) {
+        boolean isExcludedRequest(ServerWebExchange exchange) {
             return excludeRequestMappingInfo == null ? false :
                     excludeRequestMappingInfo.getMatchingCondition(exchange) != null;
         }
 
         static class Exclude {
 
-            Set<String> services = new HashSet<>();
+            Set<String> services;
 
             String[] patterns;
 
             RequestMethod[] methods;
+
+            public Set<String> getServices() {
+                return services == null ? emptySet() : services;
+            }
+
+            public void setServices(Set<String> services) {
+                this.services = services;
+            }
+
+            public void setPatterns(String[] patterns) {
+                this.patterns = patterns;
+            }
+
+            public void setMethods(RequestMethod[] methods) {
+                this.methods = methods;
+            }
         }
     }
 
@@ -339,8 +378,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
         private List<ServiceInstance> serviceInstances = new LinkedList<>();
 
-        private int size;
-
         private final AtomicInteger position = new AtomicInteger(0);
 
         RequestMappingContext(WebEndpointMapping webEndpointMapping) {
@@ -348,7 +385,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             this.id = webEndpointMapping.getId();
         }
 
-        public void setWebEndpointServiceInstanceChooseHandler(ServiceInstancePredicate serviceInstancePredicate) {
+        void setWebEndpointServiceInstanceChooseHandler(ServiceInstancePredicate serviceInstancePredicate) {
             this.serviceInstancePredicate = serviceInstancePredicate;
         }
 
@@ -359,18 +396,19 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         ServiceInstance choose(ServerWebExchange exchange) {
             List<ServiceInstance> serviceInstances = this.serviceInstances.stream()
                     .filter(serviceInstance -> serviceInstancePredicate(exchange, serviceInstance))
-                    .collect(Collectors.toList());
+                    .collect(toList());
             int size = serviceInstances.size();
             if (size == 0) {
                 return null;
             }
 
-            int offset = size == 1 ? 0 : this.position.incrementAndGet() % size;
+            int offset = size == 1 ? 0 : abs(this.position.incrementAndGet()) % size;
             return serviceInstances.get(offset);
         }
 
         boolean serviceInstancePredicate(ServerWebExchange exchange, ServiceInstance serviceInstance) {
-            if (this.serviceInstancePredicate == null) {
+            ServiceInstancePredicate serviceInstancePredicate = this.serviceInstancePredicate;
+            if (serviceInstancePredicate == null) {
                 return true;
             }
             return serviceInstancePredicate.test(exchange, serviceInstance);
@@ -379,27 +417,31 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         public int compareTo(RequestMappingContext other, ServerWebExchange exchange) {
             return this.requestMappingInfo.compareTo(other.requestMappingInfo, exchange);
         }
-
     }
 
-    private String buildBasePath(ServiceInstance serviceInstance) {
-        StringBuilder basePathBuilder = new StringBuilder();
-        basePathBuilder.append(serviceInstance.isSecure() ? "https://" : "http://")
-                .append(serviceInstance.getHost())
-                .append(":")
-                .append(serviceInstance.getPort());
+    static String buildBasePath(ServiceInstance serviceInstance) {
+        // TODO Refactor this to microsphere-spring-cloud-commons
+        boolean isSecure = serviceInstance.isSecure();
+        String prefix = isSecure ? "https://" : "http://";
+        String host = serviceInstance.getHost();
+        String port = valueOf(serviceInstance.getPort());
+        StringBuilder basePathBuilder = new StringBuilder((isSecure ? 9 : 8) + host.length() + port.length());
+        basePathBuilder.append(prefix)
+                .append(host)
+                .append(COLON_CHAR)
+                .append(port);
         // TODO append the context path
         return basePathBuilder.toString();
     }
 
-    private String buildPath(ServiceInstance serviceInstance, URI url) {
+    static String buildPath(ServiceInstance serviceInstance, URI url) {
         Map<String, String> metadata = serviceInstance.getMetadata();
         String path = url.getPath();
         if (isEmpty(metadata)) {
             return path;
         }
         String contextPath = metadata.get(WEB_CONTEXT_PATH_METADATA_NAME);
-        String servicePath = "/" + serviceInstance.getServiceId().toLowerCase();
+        String servicePath = SLASH_CHAR + serviceInstance.getServiceId().toLowerCase();
         if (path.startsWith(servicePath)) {
             return path.replaceFirst(servicePath, contextPath);
         }
@@ -419,10 +461,8 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     private static RequestMethod[] buildRequestMethods(WebEndpointMapping webEndpointMapping) {
-        String[] methods = webEndpointMapping.getMethods();
-        return methods == null ? null :
-                Stream.of(webEndpointMapping.getMethods())
-                        .map(RequestMethod::valueOf)
-                        .toArray(RequestMethod[]::new);
+        return of(webEndpointMapping.getMethods())
+                .map(RequestMethod::valueOf)
+                .toArray(RequestMethod[]::new);
     }
 }
