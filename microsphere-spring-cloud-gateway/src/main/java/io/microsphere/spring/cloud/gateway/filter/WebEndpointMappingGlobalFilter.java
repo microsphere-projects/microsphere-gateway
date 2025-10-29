@@ -44,6 +44,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     public static final String METADATA_KEY = "web-endpoint";
 
     private final DiscoveryClient discoveryClient;
+
     private ServiceInstancePredicate serviceInstancePredicate;
 
     private volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = null;
@@ -247,14 +249,14 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     private Config createConfig(Route route) {
+        Config config = new Config();
         Map<String, Object> metadata = route.getMetadata();
         if (isEmpty(metadata)) {
-            return null;
+            return config;
         }
         Map<String, Object> properties = (Map) metadata.get(METADATA_KEY);
         Map<String, Object> flatProperties = flatProperties(properties);
         ConfigurationBeanBinder beanBinder = new BindableConfigurationBeanBinder();
-        Config config = new Config();
         beanBinder.bind(flatProperties, true, true, config);
         config.init();
         return config;
@@ -316,11 +318,11 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
         static class Exclude {
 
-            Set<String> services;
+            Set<String> services = new HashSet<>();
 
-            String[] patterns = null;
+            String[] patterns;
 
-            RequestMethod[] methods = null;
+            RequestMethod[] methods;
         }
     }
 
