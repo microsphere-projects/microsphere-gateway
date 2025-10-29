@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Objects;
 
+import static io.microsphere.constants.PathConstants.SLASH;
 import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.substringBetween;
 import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
@@ -57,7 +58,7 @@ public class WebEndpointMappingGatewayAutoConfiguration {
     public ServiceInstancePredicate serviceInstancePredicate() {
         return (serverWebExchange, serviceInstance) -> {
             String rawPath = serverWebExchange.getRequest().getURI().getRawPath();
-            String basePath = substringBetween(rawPath, "/", "/");
+            String basePath = substringBetween(rawPath, SLASH, SLASH);
             if (isBlank(basePath)) {
                 return false;
             }
