@@ -114,6 +114,11 @@ spring:
 
   cloud:
     gateway:
+      routes:
+        - id: web-endpoint-mapping
+          uri: we://all
+          predicates:
+            - Path=/**
       server:
         webflux:
           routes:
