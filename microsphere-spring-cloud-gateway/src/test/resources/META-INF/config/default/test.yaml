@@ -119,6 +119,13 @@ spring:
           uri: we://all
           predicates:
             - Path=/**
+          metadata:
+            web-endpoint:
+              loadBalancer: random
+              exclude:
+                services: test-app-2
+                patterns: /test-2/**
+                methods: GET
       server:
         webflux:
           routes:
@@ -126,3 +133,10 @@ spring:
               uri: we://all
               predicates:
                 - Path=/**
+              metadata:
+                web-endpoint:
+                  loadBalancer: random
+                  exclude:
+                    services: test-app-2
+                    patterns: /test-2/**
+                    methods: GET
