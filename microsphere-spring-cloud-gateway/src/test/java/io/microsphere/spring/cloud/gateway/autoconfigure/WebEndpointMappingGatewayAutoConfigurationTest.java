@@ -18,35 +18,25 @@
 package io.microsphere.spring.cloud.gateway.autoconfigure;
 
 
-import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
-import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
+import io.microsphere.spring.cloud.gateway.filter.DefaultGatewayFilterChain;
+import io.microsphere.spring.cloud.gateway.filter.NoOpGatewayFilter;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
 import io.microsphere.spring.cloud.gateway.handler.ServiceInstancePredicate;
-import io.microsphere.spring.test.web.controller.TestController;
 import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryProperties;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.get;
 import static org.springframework.mock.web.server.MockServerWebExchange.from;
-import static org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext;
 
 /**
  * {@link WebEndpointMappingGatewayAutoConfiguration} Test
@@ -57,12 +47,7 @@ import static org.springframework.test.web.reactive.server.WebTestClient.bindToA
  */
 @SpringBootTest(
         classes = {
-                TestController.class,
                 WebEndpointMappingGatewayAutoConfigurationTest.class,
-                WebEndpointMappingGatewayAutoConfigurationTest.Config.class
-        },
-        properties = {
-                "spring.profiles.active=simple-service-registry,gateway"
         },
         webEnvironment = RANDOM_PORT
 )
@@ -75,39 +60,6 @@ class WebEndpointMappingGatewayAutoConfigurationTest {
 
     @Autowired
     private WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter;
-
-    @Autowired
-    private ConfigurableApplicationContext context;
-
-    private WebTestClient webTestClient;
-
-    @BeforeEach
-    void setUp() {
-        this.webTestClient = bindToApplicationContext(context)
-                .build();
-    }
-
-    static class Config {
-
-        @Autowired
-        private Environment environment;
-
-        private final SimpleDiscoveryProperties simpleDiscoveryProperties;
-
-        Config(SimpleDiscoveryProperties simpleDiscoveryProperties) {
-            this.simpleDiscoveryProperties = simpleDiscoveryProperties;
-        }
-
-        @EventListener(RegistrationPreRegisteredEvent.class)
-        public void onRegistrationPreRegisteredEvent(RegistrationPreRegisteredEvent event) {
-            int localServerPort = this.environment.getProperty("local.server.port", int.class);
-            DefaultRegistration registration = (DefaultRegistration) event.getRegistration();
-            Map<String, List<DefaultServiceInstance>> instancesMap = simpleDiscoveryProperties.getInstances();
-            List<DefaultServiceInstance> instances = instancesMap.computeIfAbsent(registration.getServiceId(), k -> new ArrayList<>());
-            registration.setPort(localServerPort);
-            instances.add(registration);
-        }
-    }
 
     @Test
     void testServiceInstancePredicate() {
@@ -122,17 +74,29 @@ class WebEndpointMappingGatewayAutoConfigurationTest {
 
     @Test
     void testRequestWebEndpointMappingGlobalFilter() {
-        this.webTestClient.get().uri("/test-app/test/helloworld")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody();
+        testRequestWebEndpointMappingGlobalFilter("/test", false);
+        testRequestWebEndpointMappingGlobalFilter("/test", true);
+        testRequestWebEndpointMappingGlobalFilter("we:/all/test", true);
     }
 
     void testServiceInstancePredicate(String path, String serviceId, boolean expected) {
-        MockServerHttpRequest request = get(path).build();
-        MockServerWebExchange serverWebExchange = from(request);
+        MockServerWebExchange serverWebExchange = createServerWebbExchange(path);
         DefaultServiceInstance instance = new DefaultServiceInstance();
         instance.setServiceId(serviceId);
         assertEquals(expected, serviceInstancePredicate.test(serverWebExchange, instance));
+    }
+
+    void testRequestWebEndpointMappingGlobalFilter(String path, boolean withAttribute) {
+        MockServerWebExchange serverWebExchange = createServerWebbExchange(path);
+        if (withAttribute) {
+            serverWebExchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, serverWebExchange.getRequest().getURI());
+        }
+        DefaultGatewayFilterChain chain = new DefaultGatewayFilterChain(new NoOpGatewayFilter());
+        assertNotNull(this.webEndpointMappingGlobalFilter.filter(serverWebExchange, chain));
+    }
+
+    MockServerWebExchange createServerWebbExchange(String path) {
+        MockServerHttpRequest request = get(path).build();
+        return from(request);
     }
 }
