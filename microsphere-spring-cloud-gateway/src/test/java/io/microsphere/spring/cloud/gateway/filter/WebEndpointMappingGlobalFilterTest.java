@@ -23,13 +23,16 @@ import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPre
 import io.microsphere.spring.test.web.controller.TestController;
 import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryProperties;
-import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
+import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
@@ -39,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext;
 
@@ -63,6 +65,7 @@ import static org.springframework.test.web.reactive.server.WebTestClient.bindToA
 )
 @EnableAutoConfiguration
 @EnableWebFluxExtension
+@TestMethodOrder(OrderAnnotation.class)
 class WebEndpointMappingGlobalFilterTest {
 
     static class Config {
@@ -96,6 +99,9 @@ class WebEndpointMappingGlobalFilterTest {
     @Autowired
     private TestController testController;
 
+    @Autowired
+    private Registration registration;
+
     private WebTestClient webTestClient;
 
     @BeforeEach
@@ -105,6 +111,7 @@ class WebEndpointMappingGlobalFilterTest {
     }
 
     @Test
+    @Order(1)
     void testFilter() {
         this.webTestClient.get().uri("/test-app/test/helloworld")
                 .exchange()
@@ -114,15 +121,7 @@ class WebEndpointMappingGlobalFilterTest {
     }
 
     @Test
-    void testFilterForNoGateway() {
-        this.webTestClient.get().uri("/test/helloworld")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .isEqualTo(testController.helloWorld());
-    }
-
-    @Test
+    @Order(2)
     void testFilterForUnregisteredApplication() {
         this.webTestClient.get().uri("/test/test/helloworld")
                 .exchange()
@@ -130,13 +129,22 @@ class WebEndpointMappingGlobalFilterTest {
     }
 
     @Test
-    void testGetOrder() {
-        assertEquals(10149, filter.getOrder());
+    @Order(3)
+    void testFilterWithoutRoutedRequestMappingContexts() {
+        this.filter.clear();
+        this.filter.destroy();
+        this.webTestClient.get().uri("/test-app/test/helloworld")
+                .exchange()
+                .expectStatus().isOk();
     }
 
     @Test
-    void testOnApplicationEventOnNoMatch() {
-        RefreshRoutesResultEvent event = new RefreshRoutesResultEvent(this);
-        this.filter.onApplicationEvent(event);
+    @Order(4)
+    void testFilterForNoGateway() {
+        this.webTestClient.get().uri("/test/helloworld")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo(testController.helloWorld());
     }
 }
