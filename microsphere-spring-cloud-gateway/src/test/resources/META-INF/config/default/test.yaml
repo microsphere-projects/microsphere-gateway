@@ -1,6 +1,6 @@
 spring:
   application:
-    name: microsphere-spring-gateway
+    name: test-app
 
   # default disable all
   cloud:
@@ -90,3 +90,32 @@ spring:
   cloud:
     kubernetes:
       enabled: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: simple-service-registry
+
+microsphere:
+  spring:
+    cloud:
+      service-registry:
+        auto-registration:
+          simple:
+            enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: web-endpoint-mapping
+          uri: we://all
+          predicates:
+            - Path=/**
