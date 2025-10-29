@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 
@@ -92,7 +93,22 @@ class WebEndpointMappingGatewayAutoConfigurationTest {
             serverWebExchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, serverWebExchange.getRequest().getURI());
         }
         DefaultGatewayFilterChain chain = new DefaultGatewayFilterChain(new NoOpGatewayFilter());
+
+        // test WebEndpointMappingGlobalFilter#filter(ServerWebExchange, GatewayFilterChain)
         assertNotNull(this.webEndpointMappingGlobalFilter.filter(serverWebExchange, chain));
+
+        // test WebEndpointMappingGlobalFilter#getOrder()
+        assertEquals(10149, this.webEndpointMappingGlobalFilter.getOrder());
+
+        // test WebEndpointMappingGlobalFilter#destroy()
+        this.webEndpointMappingGlobalFilter.destroy();
+
+        // test WebEndpointMappingGlobalFilter#onApplicationEvent(RefreshRoutesResultEvent)
+        RefreshRoutesResultEvent event = new RefreshRoutesResultEvent(this);
+        this.webEndpointMappingGlobalFilter.onApplicationEvent(event);
+
+        event = new RefreshRoutesResultEvent(this, new Exception("For testing"));
+        this.webEndpointMappingGlobalFilter.onApplicationEvent(event);
     }
 
     MockServerWebExchange createServerWebbExchange(String path) {
