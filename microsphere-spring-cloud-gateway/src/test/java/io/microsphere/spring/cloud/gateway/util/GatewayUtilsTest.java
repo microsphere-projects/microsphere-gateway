@@ -18,7 +18,6 @@
 package io.microsphere.spring.cloud.gateway.util;
 
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.env.MockEnvironment;
 
@@ -38,25 +37,16 @@ import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
  */
 class GatewayUtilsTest {
 
-    private MockEnvironment mockEnvironment;
-
-    @BeforeEach
-    void setUp() {
-        this.mockEnvironment = new MockEnvironment();
-    }
-
     @Test
     void testGetGatewayProperties() {
+        MockEnvironment mockEnvironment = new MockEnvironment();
         Map<String, Object> gatewayProperties = getGatewayProperties(mockEnvironment);
         assertTrue(gatewayProperties.isEmpty());
 
-        mockEnvironment.setProperty(PREFIX + ".enabled", "true");
+        String propertyName = PREFIX + ".enabled";
+        mockEnvironment.setProperty(propertyName, "true");
         gatewayProperties = getGatewayProperties(mockEnvironment);
         assertEquals(1, gatewayProperties.size());
         assertEquals("true", gatewayProperties.get("enabled"));
-    }
-
-    @Test
-    void testGetRouteProperties() {
     }
 }
