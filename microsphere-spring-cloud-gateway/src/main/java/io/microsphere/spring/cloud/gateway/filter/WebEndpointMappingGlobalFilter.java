@@ -19,13 +19,11 @@ package io.microsphere.spring.cloud.gateway.filter;
 import io.microsphere.annotation.Nonnull;
 import io.microsphere.logging.Logger;
 import io.microsphere.spring.boot.context.config.BindableConfigurationBeanBinder;
-import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapter;
 import io.microsphere.spring.context.config.ConfigurationBeanBinder;
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.Response;
 import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -123,9 +121,9 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
     volatile Map<String, Config> routedConfigs = null;
 
-    public WebEndpointMappingGlobalFilter(ReactiveDiscoveryClient reactiveDiscoveryClient,
+    public WebEndpointMappingGlobalFilter(DiscoveryClient discoveryClient,
                                           LoadBalancerClientFactory clientFactory) {
-        this.discoveryClient = new ReactiveDiscoveryClientAdapter(reactiveDiscoveryClient);
+        this.discoveryClient = discoveryClient;
         this.clientFactory = clientFactory;
     }
 
