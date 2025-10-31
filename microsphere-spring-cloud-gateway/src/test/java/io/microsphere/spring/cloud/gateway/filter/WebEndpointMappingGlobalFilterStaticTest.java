@@ -30,6 +30,7 @@ import static io.microsphere.spring.cloud.client.service.registry.constants.Inst
 import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.buildPath;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.Kind.WEB_FLUX;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.of;
+import static java.net.URI.create;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -74,7 +75,7 @@ public class WebEndpointMappingGlobalFilterStaticTest {
         serviceInstance.getMetadata().put(WEB_CONTEXT_PATH_METADATA_NAME, "/");
         assertEquals("", buildPath(serviceInstance, uri));
 
-        uri = URI.create("we://all/test-app/test-path");
+        uri = create("we://all/test-app/test-path");
         assertEquals("/test-path", buildPath(serviceInstance, uri));
     }
 
