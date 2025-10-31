@@ -44,8 +44,13 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
 @ConditionalOnReactiveDiscoveryEnabled
 @ConditionalOnGatewayEnabled
 @AutoConfigureAfter(
-        value = GatewayAutoConfiguration.class,
-        name = "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration"
+        value = {
+                GatewayAutoConfiguration.class
+        },
+        name = {
+                "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration",
+                "org.springframework.cloud.client.discovery.composite.reactive.ReactiveCompositeDiscoveryClientAutoConfiguration"
+        }
 )
 public class WebEndpointMappingGatewayAutoConfiguration {
 
