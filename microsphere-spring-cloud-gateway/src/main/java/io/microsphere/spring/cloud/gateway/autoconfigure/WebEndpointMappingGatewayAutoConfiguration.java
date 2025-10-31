@@ -16,13 +16,14 @@
  */
 package io.microsphere.spring.cloud.gateway.autoconfigure;
 
+import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapter;
+import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
 import io.microsphere.spring.cloud.gateway.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
-import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
@@ -45,7 +46,8 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
 @ConditionalOnGatewayEnabled
 @AutoConfigureAfter(
         value = {
-                GatewayAutoConfiguration.class
+                GatewayAutoConfiguration.class,
+                ReactiveDiscoveryClientAutoConfiguration.class
         },
         name = {
                 "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration",
@@ -56,8 +58,8 @@ public class WebEndpointMappingGatewayAutoConfiguration {
 
     @Bean
     @ConditionalOnEnabledGlobalFilter
-    @ConditionalOnBean(value = {ReactiveDiscoveryClient.class, LoadBalancerClientFactory.class}, search = CURRENT)
-    public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(ReactiveDiscoveryClient reactiveDiscoveryClient,
+    @ConditionalOnBean(value = {ReactiveDiscoveryClientAdapter.class, LoadBalancerClientFactory.class}, search = CURRENT)
+    public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(ReactiveDiscoveryClientAdapter reactiveDiscoveryClient,
                                                                          LoadBalancerClientFactory loadBalancerClientFactory) {
         return new WebEndpointMappingGlobalFilter(reactiveDiscoveryClient, loadBalancerClientFactory);
     }
