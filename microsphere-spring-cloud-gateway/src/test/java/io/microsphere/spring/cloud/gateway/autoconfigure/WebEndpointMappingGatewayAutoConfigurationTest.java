@@ -21,13 +21,11 @@ package io.microsphere.spring.cloud.gateway.autoconfigure;
 import io.microsphere.spring.cloud.gateway.filter.DefaultGatewayFilterChain;
 import io.microsphere.spring.cloud.gateway.filter.NoOpGatewayFilter;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
-import io.microsphere.spring.cloud.gateway.handler.ServiceInstancePredicate;
 import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
@@ -57,34 +55,13 @@ import static org.springframework.mock.web.server.MockServerWebExchange.from;
 class WebEndpointMappingGatewayAutoConfigurationTest {
 
     @Autowired
-    private ServiceInstancePredicate serviceInstancePredicate;
-
-    @Autowired
     private WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter;
-
-    @Test
-    void testServiceInstancePredicate() {
-        testServiceInstancePredicate("/test/abc", "test", true);
-        testServiceInstancePredicate("/test/abc", "TEST", true);
-        testServiceInstancePredicate("/test/abc", "Test", true);
-        testServiceInstancePredicate("/test/abc", "t", false);
-        testServiceInstancePredicate("/", "t", false);
-        testServiceInstancePredicate("", "t", false);
-        testServiceInstancePredicate("/a", "t", false);
-    }
 
     @Test
     void testRequestWebEndpointMappingGlobalFilter() {
         testRequestWebEndpointMappingGlobalFilter("/test", false);
         testRequestWebEndpointMappingGlobalFilter("/test", true);
         testRequestWebEndpointMappingGlobalFilter("we:/all/test", true);
-    }
-
-    void testServiceInstancePredicate(String path, String serviceId, boolean expected) {
-        MockServerWebExchange serverWebExchange = createServerWebbExchange(path);
-        DefaultServiceInstance instance = new DefaultServiceInstance();
-        instance.setServiceId(serviceId);
-        assertEquals(expected, serviceInstancePredicate.test(serverWebExchange, instance));
     }
 
     void testRequestWebEndpointMappingGlobalFilter(String path, boolean withAttribute) {

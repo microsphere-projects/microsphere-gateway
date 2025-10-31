@@ -30,8 +30,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
 import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryProperties;
+import org.springframework.cloud.client.discovery.simple.reactive.SimpleReactiveDiscoveryProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
@@ -39,6 +40,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,14 +70,15 @@ import static org.springframework.test.web.reactive.server.WebTestClient.bindToA
 @TestMethodOrder(OrderAnnotation.class)
 class WebEndpointMappingGlobalFilterTest {
 
+    @ConditionalOnReactiveDiscoveryEnabled
     static class Config {
 
         @Autowired
         private Environment environment;
 
-        private final SimpleDiscoveryProperties simpleDiscoveryProperties;
+        private final SimpleReactiveDiscoveryProperties simpleDiscoveryProperties;
 
-        Config(SimpleDiscoveryProperties simpleDiscoveryProperties) {
+        Config(SimpleReactiveDiscoveryProperties simpleDiscoveryProperties) {
             this.simpleDiscoveryProperties = simpleDiscoveryProperties;
         }
 
@@ -83,10 +86,13 @@ class WebEndpointMappingGlobalFilterTest {
         public void onRegistrationPreRegisteredEvent(RegistrationPreRegisteredEvent event) {
             int localServerPort = this.environment.getProperty("local.server.port", int.class);
             DefaultRegistration registration = (DefaultRegistration) event.getRegistration();
-            Map<String, List<DefaultServiceInstance>> instancesMap = simpleDiscoveryProperties.getInstances();
+            Map<String, List<DefaultServiceInstance>> instancesMap = new HashMap<>();
             List<DefaultServiceInstance> instances = instancesMap.computeIfAbsent(registration.getServiceId(), k -> new ArrayList<>());
             registration.setPort(localServerPort);
             instances.add(registration);
+            instances.add(registration);
+            instances.add(registration);
+            simpleDiscoveryProperties.setInstances(instancesMap);
         }
     }
 

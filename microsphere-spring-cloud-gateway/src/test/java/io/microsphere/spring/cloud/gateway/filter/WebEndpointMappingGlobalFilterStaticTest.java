@@ -23,22 +23,16 @@ import io.microsphere.spring.web.metadata.WebEndpointMapping;
 import org.junit.jupiter.api.Test;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
-import org.springframework.mock.web.server.MockServerWebExchange;
 
 import java.net.URI;
 
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
-import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.buildBasePath;
 import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.buildPath;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.Kind.WEB_FLUX;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.of;
 import static java.net.URI.create;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.get;
-import static org.springframework.mock.web.server.MockServerWebExchange.from;
 
 /**
  * {@link WebEndpointMappingGlobalFilter} Static staff Test
@@ -70,20 +64,6 @@ public class WebEndpointMappingGlobalFilterStaticTest {
         ServiceInstance serviceInstance = createServiceInstance();
         context.addServiceInstance(serviceInstance);
         context.addServiceInstance(serviceInstance);
-
-        MockServerHttpRequest request = get("/test-app/test/helloworld").build();
-        MockServerWebExchange exchange = from(request);
-
-        for (int i = 0; i < 10; i++) {
-            assertSame(serviceInstance, context.choose(exchange));
-        }
-    }
-
-    @Test
-    void testBuildBasePath() {
-        ServiceInstance serviceInstance = createServiceInstance();
-        String basePath = buildBasePath(serviceInstance);
-        assertEquals("https://127.0.0.1:8080", basePath);
     }
 
     @Test
