@@ -18,28 +18,21 @@ package io.microsphere.spring.cloud.gateway.autoconfigure;
 
 import io.microsphere.spring.cloud.gateway.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
-import io.microsphere.spring.cloud.gateway.handler.ServiceInstancePredicate;
-import io.microsphere.spring.web.metadata.WebEndpointMapping;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
+import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Objects;
-
-import static io.microsphere.constants.PathConstants.SLASH;
-import static io.microsphere.util.StringUtils.isBlank;
-import static io.microsphere.util.StringUtils.substringBetween;
 import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
 
 /**
- * Gateway Auto-Configuration for {@link WebEndpointMapping}
+ * Gateway Auto-Configuration for {@link io.microsphere.spring.web.metadata.WebEndpointMapping}
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGlobalFilter
@@ -48,33 +41,19 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnDiscoveryEnabled
+@ConditionalOnReactiveDiscoveryEnabled
 @ConditionalOnGatewayEnabled
-@AutoConfigureAfter(GatewayAutoConfiguration.class)
+@AutoConfigureAfter(
+        value = GatewayAutoConfiguration.class,
+        name = "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration"
+)
 public class WebEndpointMappingGatewayAutoConfiguration {
 
     @Bean
     @ConditionalOnEnabledGlobalFilter
-    @ConditionalOnMissingBean(value = ServiceInstancePredicate.class)
-    public ServiceInstancePredicate serviceInstancePredicate() {
-        return (serverWebExchange, serviceInstance) -> {
-            String rawPath = serverWebExchange.getRequest().getURI().getRawPath();
-            String basePath = substringBetween(rawPath, SLASH, SLASH);
-            if (isBlank(basePath)) {
-                return false;
-            }
-            String serviceId = serviceInstance.getServiceId().toLowerCase();
-            return Objects.equals(serviceId, basePath);
-        };
+    @ConditionalOnBean(value = {ReactiveDiscoveryClient.class, LoadBalancerClientFactory.class}, search = CURRENT)
+    public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(ReactiveDiscoveryClient reactiveDiscoveryClient,
+                                                                         LoadBalancerClientFactory loadBalancerClientFactory) {
+        return new WebEndpointMappingGlobalFilter(reactiveDiscoveryClient, loadBalancerClientFactory);
     }
-
-    @Bean
-    @ConditionalOnEnabledGlobalFilter
-    @ConditionalOnBean(value = DiscoveryClient.class, search = CURRENT)
-    public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(DiscoveryClient discoveryClient,
-                                                                         ObjectProvider<ServiceInstancePredicate> webEndpointServiceInstanceChooseHandler) {
-        WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter = new WebEndpointMappingGlobalFilter(discoveryClient);
-        webEndpointMappingGlobalFilter.setWebEndpointServiceInstanceChooseHandler(webEndpointServiceInstanceChooseHandler.getIfAvailable());
-        return webEndpointMappingGlobalFilter;
-    }
-
 }

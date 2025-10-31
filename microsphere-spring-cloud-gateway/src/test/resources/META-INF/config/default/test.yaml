@@ -118,10 +118,9 @@ spring:
         - id: web-endpoint-mapping
           uri: we://all
           predicates:
-            - Path=/**
+            - Path=/{application}/**
           metadata:
             web-endpoint:
-              loadBalancer: random
               exclude:
                 services: test-app-2
                 patterns: /test-2/**
@@ -132,10 +131,9 @@ spring:
             - id: web-endpoint-mapping
               uri: we://all
               predicates:
-                - Path=/**
+                - Path=/{application}/**
               metadata:
                 web-endpoint:
-                  loadBalancer: random
                   exclude:
                     services: test-app-2
                     patterns: /test-2/**
