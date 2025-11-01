@@ -21,6 +21,8 @@ package io.microsphere.spring.cloud.gateway.util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.env.YamlPropertySourceLoader;
+import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
+import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.env.MockEnvironment;
@@ -31,9 +33,11 @@ import java.util.Map;
 
 import static io.microsphere.spring.cloud.gateway.util.GatewayUtils.getGatewayProperties;
 import static io.microsphere.spring.cloud.gateway.util.GatewayUtils.getRouteProperties;
+import static io.microsphere.spring.cloud.gateway.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 
 /**
@@ -85,5 +89,15 @@ class GatewayUtilsTest {
         routeId += "-1";
         routeProperties = getRouteProperties(mockEnvironment, routeId);
         assertTrue(routeProperties.isEmpty());
+    }
+
+    @Test
+    void testIsSuccessRouteLocatorEvent() {
+        assertFalse(isSuccessRouteLocatorEvent(null));
+        assertFalse(isSuccessRouteLocatorEvent(new RefreshRoutesResultEvent(this)));
+
+        RouteLocator routeLocator = mock(RouteLocator.class);
+        assertTrue(isSuccessRouteLocatorEvent(new RefreshRoutesResultEvent(routeLocator)));
+        assertFalse(isSuccessRouteLocatorEvent(new RefreshRoutesResultEvent(routeLocator, new Exception("For testing"))));
     }
 }
