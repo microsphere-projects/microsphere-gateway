@@ -18,13 +18,13 @@ package io.microsphere.spring.cloud.gateway.handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.cloud.gateway.config.GatewayProperties;
-import org.springframework.cloud.gateway.config.PropertiesRouteDefinitionLocator;
 import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
-import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
-import org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator;
+import org.springframework.cloud.gateway.route.RouteLocator;
 
 import static java.util.Collections.emptyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static reactor.core.publisher.Flux.empty;
 
 /**
  * {@link CachingFilteringWebHandler} Test
@@ -63,10 +63,9 @@ public class CachingFilteringWebHandlerTest {
     }
 
     void testOnRefreshRoutesResultEvent(Throwable throwable) {
-        GatewayProperties properties = new GatewayProperties();
-        RouteDefinitionLocator routeDefinitionLocator = new PropertiesRouteDefinitionLocator(properties);
-        RouteDefinitionRouteLocator locator = new RouteDefinitionRouteLocator(routeDefinitionLocator, emptyList(), emptyList(), properties, null);
-        RefreshRoutesResultEvent event = new RefreshRoutesResultEvent(locator, throwable);
+        RouteLocator routeLocator = mock(RouteLocator.class);
+        when(routeLocator.getRoutes()).thenReturn(empty());
+        RefreshRoutesResultEvent event = new RefreshRoutesResultEvent(routeLocator, throwable);
         this.webHandler.onRefreshRoutesResultEvent(event);
     }
 }
