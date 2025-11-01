@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
+import static io.microsphere.spring.cloud.gateway.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
@@ -53,7 +54,7 @@ import static org.springframework.core.annotation.AnnotationAwareOrderComparator
  */
 public class CachingFilteringWebHandler extends FilteringWebHandler implements DisposableBean {
 
-    private static final GatewayFilter[] EMPTY_FILTER_ARRAY = new GatewayFilter[0];
+    static final GatewayFilter[] EMPTY_FILTER_ARRAY = new GatewayFilter[0];
 
     private volatile Map<String, GatewayFilter[]> routedGatewayFiltersCache = null;
 
@@ -93,7 +94,7 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
         return routedGatewayFiltersCache;
     }
 
-    private GatewayFilter[] getRoutedGatewayFilters(Route route) {
+    GatewayFilter[] getRoutedGatewayFilters(Route route) {
         Map<String, GatewayFilter[]> routedGatewayFiltersCache = this.routedGatewayFiltersCache;
         if (routedGatewayFiltersCache == null) {
             return EMPTY_FILTER_ARRAY;
@@ -114,7 +115,7 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
     }
 
     private boolean matchesEvent(RefreshRoutesResultEvent event) {
-        return event.isSuccess() && (event.getSource() instanceof RouteLocator);
+        return isSuccessRouteLocatorEvent(event);
     }
 
     private List<GatewayFilter> globalFilters() {
