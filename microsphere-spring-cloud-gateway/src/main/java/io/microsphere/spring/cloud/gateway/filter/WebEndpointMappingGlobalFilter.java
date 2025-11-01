@@ -61,6 +61,7 @@ import static io.microsphere.spring.cloud.client.service.registry.constants.Inst
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getUriString;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
 import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config.DEFAULT_CONFIG;
+import static io.microsphere.spring.cloud.gateway.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.spring.web.util.MonoUtils.getValue;
 import static io.microsphere.util.ArrayUtils.isNotEmpty;
@@ -314,7 +315,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     private boolean matchesEvent(RefreshRoutesResultEvent event) {
-        return event.isSuccess() && (event.getSource() instanceof RouteLocator);
+        return isSuccessRouteLocatorEvent(event);
     }
 
     Collection<String> getSubscribedServices(Route route, Config config) {
