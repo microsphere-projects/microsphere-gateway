@@ -18,7 +18,9 @@ package io.microsphere.spring.cloud.gateway.util;
 
 import io.microsphere.util.Utils;
 import org.springframework.cloud.gateway.config.GatewayProperties;
+import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
@@ -90,6 +92,16 @@ public abstract class GatewayUtils implements Utils {
         }
 
         return unmodifiableMap(routeProperties);
+    }
+
+    /**
+     * Is the specified {@link RefreshRoutesResultEvent} success and the source is {@link RouteLocator}
+     *
+     * @param event {@link RefreshRoutesResultEvent}
+     * @return if success and the source is {@link RouteLocator}, return <code>true</code>, or <code>false</code>
+     */
+    public static boolean isSuccessRouteLocatorEvent(RefreshRoutesResultEvent event) {
+        return event != null && event.isSuccess() && (event.getSource() instanceof RouteLocator);
     }
 
     private GatewayUtils() {
