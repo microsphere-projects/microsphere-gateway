@@ -20,17 +20,15 @@ package io.microsphere.spring.cloud.gateway.annotation;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
+import static io.microsphere.spring.cloud.gateway.constants.GatewayPropertyConstants.GATEWAY_ENABLED_PROPERTY_NAME;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 
 /**
  * The conditional annotation meta-annotates {@link ConditionalOnProperty @ConditionalOnProperty} for
@@ -45,15 +43,6 @@ import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 @Documented
-@ConditionalOnProperty(prefix = PREFIX, name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+@ConditionalOnProperty(name = GATEWAY_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 public @interface ConditionalOnGatewayEnabled {
-
-    /**
-     * Specify if the condition should match if the property is not set. Defaults to
-     * {@code true}.
-     *
-     * @return if the condition should match if the property is missing
-     */
-    @AliasFor(annotation = ConditionalOnProperty.class, attribute = "matchIfMissing")
-    boolean matchIfMissing() default true;
 }
