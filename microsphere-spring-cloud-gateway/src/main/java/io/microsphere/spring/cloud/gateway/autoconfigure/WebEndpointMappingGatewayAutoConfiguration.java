@@ -16,28 +16,24 @@
  */
 package io.microsphere.spring.cloud.gateway.autoconfigure;
 
+import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapter;
+import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
+import io.microsphere.spring.cloud.gateway.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
-import io.microsphere.spring.cloud.gateway.handler.ServiceInstancePredicate;
-import io.microsphere.spring.web.metadata.WebEndpointMapping;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.Objects;
+import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
 
 /**
- * Gateway Auto-Configuration for {@link WebEndpointMapping}
+ * Gateway Auto-Configuration for {@link io.microsphere.spring.web.metadata.WebEndpointMapping}
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGlobalFilter
@@ -46,31 +42,25 @@ import java.util.Objects;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnDiscoveryEnabled
-@ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
-@AutoConfigureAfter(GatewayAutoConfiguration.class)
+@ConditionalOnReactiveDiscoveryEnabled
+@ConditionalOnGatewayEnabled
+@AutoConfigureAfter(
+        value = {
+                GatewayAutoConfiguration.class,
+                ReactiveDiscoveryClientAutoConfiguration.class
+        },
+        name = {
+                "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration",
+                "org.springframework.cloud.client.discovery.composite.reactive.ReactiveCompositeDiscoveryClientAutoConfiguration"
+        }
+)
 public class WebEndpointMappingGatewayAutoConfiguration {
 
     @Bean
     @ConditionalOnEnabledGlobalFilter
-    @ConditionalOnMissingBean(value = ServiceInstancePredicate.class)
-    public ServiceInstancePredicate serviceInstancePredicate() {
-        return (serverWebExchange, serviceInstance) -> {
-            String[] paths = StringUtils.tokenizeToStringArray(serverWebExchange.getRequest().getURI().getRawPath(), "/");
-            if (ObjectUtils.isEmpty(paths)) {
-                return false;
-            }
-            return Objects.equals(paths[0], serviceInstance.getServiceId().toLowerCase());
-        };
+    @ConditionalOnBean(value = {ReactiveDiscoveryClientAdapter.class, LoadBalancerClientFactory.class}, search = CURRENT)
+    public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(ReactiveDiscoveryClientAdapter reactiveDiscoveryClient,
+                                                                         LoadBalancerClientFactory loadBalancerClientFactory) {
+        return new WebEndpointMappingGlobalFilter(reactiveDiscoveryClient, loadBalancerClientFactory);
     }
-
-    @Bean
-    @ConditionalOnEnabledGlobalFilter
-    @ConditionalOnBean(value = DiscoveryClient.class, search = SearchStrategy.CURRENT)
-    public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(DiscoveryClient discoveryClient,
-                                                                         ObjectProvider<ServiceInstancePredicate> webEndpointServiceInstanceChooseHandler) {
-        WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter = new WebEndpointMappingGlobalFilter(discoveryClient);
-        webEndpointMappingGlobalFilter.setWebEndpointServiceInstanceChooseHandler(webEndpointServiceInstanceChooseHandler.getIfAvailable());
-        return webEndpointMappingGlobalFilter;
-    }
-
 }
