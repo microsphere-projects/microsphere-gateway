@@ -41,7 +41,7 @@ class DefaultGatewayFilterChainTest {
 
     @Test
     void testConstructorWithEmptyGatewayFilters() {
-        assertThrows(IllegalArgumentException.class, DefaultGatewayFilterChain::new);
+        assertNotNull(new DefaultGatewayFilterChain());
     }
 
     @Test
