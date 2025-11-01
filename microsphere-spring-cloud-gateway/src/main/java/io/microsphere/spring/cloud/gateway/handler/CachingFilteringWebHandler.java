@@ -28,13 +28,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
-import static io.microsphere.util.ArrayUtils.asArray;
-import static io.microsphere.util.ArrayUtils.combineArray;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
@@ -56,21 +55,10 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
 
     private static final GatewayFilter[] EMPTY_FILTER_ARRAY = new GatewayFilter[0];
 
-    private final GatewayFilter[] globalFilters;
-
     private volatile Map<String, GatewayFilter[]> routedGatewayFiltersCache = null;
 
     public CachingFilteringWebHandler(List<GlobalFilter> globalFilters) {
         super(globalFilters);
-        this.globalFilters = getFieldValue(this, "globalFilters");
-    }
-
-    @EventListener(RefreshRoutesResultEvent.class)
-    public void onRefreshRoutesResultEvent(RefreshRoutesResultEvent event) {
-        if (matchesEvent(event)) {
-            RouteLocator routeLocator = (RouteLocator) event.getSource();
-            this.routedGatewayFiltersCache = buildRoutedGatewayFiltersCache(routeLocator);
-        }
     }
 
     @Override
@@ -81,9 +69,17 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         if (routedGatewayFiltersCache != null) {
             routedGatewayFiltersCache.clear();
+        }
+    }
+
+    @EventListener(RefreshRoutesResultEvent.class)
+    public void onRefreshRoutesResultEvent(RefreshRoutesResultEvent event) {
+        if (matchesEvent(event)) {
+            RouteLocator routeLocator = (RouteLocator) event.getSource();
+            this.routedGatewayFiltersCache = buildRoutedGatewayFiltersCache(routeLocator);
         }
     }
 
@@ -108,18 +104,20 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
     }
 
     private GatewayFilter[] combineGatewayFilters(Route route) {
-        GatewayFilter[] globalFilters = getGlobalFilters();
-        GatewayFilter[] gatewayFilters = asArray(route.getFilters(), GatewayFilter.class);
-        GatewayFilter[] combinedGatewayFilters = combineArray(globalFilters, gatewayFilters);
-        sort(combinedGatewayFilters);
-        return combinedGatewayFilters;
+        List<GatewayFilter> globalFilters = globalFilters();
+        List<GatewayFilter> gatewayFilters = route.getFilters();
+        List<GatewayFilter> allFilters = new ArrayList<>(globalFilters.size() + gatewayFilters.size());
+        allFilters.addAll(globalFilters);
+        allFilters.addAll(gatewayFilters);
+        sort(allFilters);
+        return allFilters.toArray(EMPTY_FILTER_ARRAY);
     }
 
     private boolean matchesEvent(RefreshRoutesResultEvent event) {
         return event.isSuccess() && (event.getSource() instanceof RouteLocator);
     }
 
-    private GatewayFilter[] getGlobalFilters() {
-        return globalFilters;
+    private List<GatewayFilter> globalFilters() {
+        return getFieldValue(this, "globalFilters");
     }
 }
