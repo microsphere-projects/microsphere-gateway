@@ -16,6 +16,12 @@
  */
 package io.microsphere.spring.cloud.gateway.constants;
 
+import org.springframework.cloud.gateway.config.GatewayProperties;
+
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
+import static io.microsphere.constants.SymbolConstants.DOT;
+import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
+
 /**
  * Gateway Property Constants
  *
@@ -23,4 +29,11 @@ package io.microsphere.spring.cloud.gateway.constants;
  * @since 1.0.0
  */
 public interface GatewayPropertyConstants {
+
+    /**
+     * The property name of Gateway enabled.
+     *
+     * @see GatewayProperties#PREFIX
+     */
+    String GATEWAY_ENABLED_PROPERTY_NAME = PREFIX + DOT + ENABLED_PROPERTY_NAME;
 }
