@@ -21,7 +21,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
 import org.springframework.cloud.gateway.route.RouteLocator;
 
+import static io.microsphere.spring.cloud.gateway.handler.CachingFilteringWebHandler.EMPTY_FILTER_ARRAY;
 import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Flux.empty;
@@ -60,6 +62,11 @@ public class CachingFilteringWebHandlerTest {
     @Test
     void testOnRefreshRoutesResultEventWithThrowable() {
         testOnRefreshRoutesResultEvent(new Exception("For testing"));
+    }
+
+    @Test
+    void testGetRoutedGatewayFilters() {
+        assertSame(EMPTY_FILTER_ARRAY, this.webHandler.getRoutedGatewayFilters(null));
     }
 
     void testOnRefreshRoutesResultEvent(Throwable throwable) {
