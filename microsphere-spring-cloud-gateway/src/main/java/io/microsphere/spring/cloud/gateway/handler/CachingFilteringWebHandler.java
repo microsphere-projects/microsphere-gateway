@@ -28,13 +28,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.microsphere.invoke.MethodHandleUtils.LookupMode.ALL;
-import static io.microsphere.invoke.MethodHandleUtils.lookup;
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
 import static io.microsphere.util.ArrayUtils.asArray;
 import static io.microsphere.util.ArrayUtils.combineArray;
@@ -56,8 +53,6 @@ import static org.springframework.core.annotation.AnnotationAwareOrderComparator
  * @since 1.0.0
  */
 public class CachingFilteringWebHandler extends FilteringWebHandler implements DisposableBean {
-
-    private static final MethodHandles.Lookup lookup = lookup(FilteringWebHandler.class, ALL);
 
     private static final GatewayFilter[] EMPTY_FILTER_ARRAY = new GatewayFilter[0];
 
