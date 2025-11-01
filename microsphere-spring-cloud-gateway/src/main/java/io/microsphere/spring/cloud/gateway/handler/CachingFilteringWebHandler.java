@@ -28,7 +28,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +35,7 @@ import java.util.Map;
 
 import static io.microsphere.invoke.MethodHandleUtils.LookupMode.ALL;
 import static io.microsphere.invoke.MethodHandleUtils.lookup;
+import static io.microsphere.reflect.FieldUtils.getFieldValue;
 import static io.microsphere.util.ArrayUtils.asArray;
 import static io.microsphere.util.ArrayUtils.combineArray;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
@@ -59,27 +59,16 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
 
     private static final MethodHandles.Lookup lookup = lookup(FilteringWebHandler.class, ALL);
 
-    private static final MethodHandle globalFiltersMethodHandle;
-
     private static final GatewayFilter[] EMPTY_FILTER_ARRAY = new GatewayFilter[0];
 
     private final GatewayFilter[] globalFilters;
 
     private volatile Map<String, GatewayFilter[]> routedGatewayFiltersCache = null;
 
-    static {
-        try {
-            globalFiltersMethodHandle = lookup.findGetter(FilteringWebHandler.class, "globalFilters", List.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public CachingFilteringWebHandler(List<GlobalFilter> globalFilters) {
         super(globalFilters);
-        this.globalFilters = resolveGlobalFilters();
+        this.globalFilters = getFieldValue(this, "globalFilters");
     }
-
 
     @EventListener(RefreshRoutesResultEvent.class)
     public void onRefreshRoutesResultEvent(RefreshRoutesResultEvent event) {
@@ -137,15 +126,5 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
 
     private GatewayFilter[] getGlobalFilters() {
         return globalFilters;
-    }
-
-    private GatewayFilter[] resolveGlobalFilters() {
-        final List<GatewayFilter> globalFilters;
-        try {
-            globalFilters = (List<GatewayFilter>) globalFiltersMethodHandle.invoke(this);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-        return asArray(globalFilters, GatewayFilter.class);
     }
 }
