@@ -127,8 +127,7 @@ We welcome your contributions! Please read [Code of Conduct](./CODE_OF_CONDUCT.m
 
 ### JavaDoc
 
-- [microsphere-gateway-commons](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-gateway-commons)
-- [microsphere-gateway-openfeign](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-gateway-openfeign)
+- [microsphere-spring-cloud-gateway](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway)
 
 ## License
 
