@@ -41,6 +41,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class CachingFilteringWebHandlerTest {
 
     @Test
-    public void test() {
+    public void testHandle() {
+    }
+
+
+    @Test
+    public void testDestroy() {
     }
 }
