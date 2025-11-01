@@ -21,9 +21,8 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import static io.microsphere.util.ArrayUtils.length;
 import static io.microsphere.util.Assert.assertNoNullElements;
-import static io.microsphere.util.Assert.assertTrue;
+import static io.microsphere.util.Assert.assertNotNull;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 
@@ -43,11 +42,10 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
     private int position;
 
     public DefaultGatewayFilterChain(GatewayFilter... gatewayFilters) {
-        int length = length(gatewayFilters);
-        assertTrue(length != 0, () -> "The 'gatewayFilters' must not be empty");
+        assertNotNull(gatewayFilters, "The 'gatewayFilters' must not be null");
         assertNoNullElements(gatewayFilters, "Any element of 'gatewayFilters' must not be null");
         this.gatewayFilters = gatewayFilters;
-        this.length = length;
+        this.length = gatewayFilters.length;
         this.position = 0;
     }
 
