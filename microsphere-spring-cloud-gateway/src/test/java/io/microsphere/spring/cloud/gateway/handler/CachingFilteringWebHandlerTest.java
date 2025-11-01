@@ -16,13 +16,15 @@
  */
 package io.microsphere.spring.cloud.gateway.handler;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.cloud.gateway.config.GatewayProperties;
+import org.springframework.cloud.gateway.config.PropertiesRouteDefinitionLocator;
+import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
+import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
+import org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator;
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static java.util.Collections.emptyList;
 
 /**
  * {@link CachingFilteringWebHandler} Test
@@ -30,22 +32,41 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        webEnvironment = RANDOM_PORT,
-        classes = {
-                CachingFilteringWebHandlerTest.class
-        }
-)
-@EnableAutoConfiguration
 public class CachingFilteringWebHandlerTest {
 
-    @Test
-    public void testHandle() {
-    }
+    private CachingFilteringWebHandler webHandler;
 
+    @BeforeEach
+    void setUp() {
+        this.webHandler = new CachingFilteringWebHandler(emptyList());
+    }
 
     @Test
     public void testDestroy() {
+        testOnRefreshRoutesResultEvent();
+        this.webHandler.destroy();
+    }
+
+    @Test
+    public void testDestroyWithoutInitialization() {
+        this.webHandler.destroy();
+    }
+
+    @Test
+    void testOnRefreshRoutesResultEvent() {
+        testOnRefreshRoutesResultEvent(null);
+    }
+
+    @Test
+    void testOnRefreshRoutesResultEventWithThrowable() {
+        testOnRefreshRoutesResultEvent(new Exception("For testing"));
+    }
+
+    void testOnRefreshRoutesResultEvent(Throwable throwable) {
+        GatewayProperties properties = new GatewayProperties();
+        RouteDefinitionLocator routeDefinitionLocator = new PropertiesRouteDefinitionLocator(properties);
+        RouteDefinitionRouteLocator locator = new RouteDefinitionRouteLocator(routeDefinitionLocator, emptyList(), emptyList(), properties, null);
+        RefreshRoutesResultEvent event = new RefreshRoutesResultEvent(locator, throwable);
+        this.webHandler.onRefreshRoutesResultEvent(event);
     }
 }
