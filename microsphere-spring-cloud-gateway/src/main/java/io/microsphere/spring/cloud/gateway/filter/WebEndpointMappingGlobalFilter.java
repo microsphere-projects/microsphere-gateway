@@ -165,7 +165,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
                 return chain.filter(exchange.mutate().request(request).build());
             }
         }
-
         return chain.filter(exchange);
     }
 
@@ -177,8 +176,12 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     private RequestMappingContext getMatchingRequestMappingContext(String applicationName, ServerWebExchange exchange) {
-        String routeId = getRouteId(exchange);
+        Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
+        String routeId = route.getId();
+        return getMatchingRequestMappingContext(applicationName, routeId, exchange);
+    }
 
+    RequestMappingContext getMatchingRequestMappingContext(String applicationName, String routeId, ServerWebExchange exchange) {
         if (isExcludedRequest(routeId, exchange)) {
             // The request is excluded
             logger.trace("The request is excluded");
@@ -223,10 +226,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         return first(matchesRequestMappings);
     }
 
-    private String getRouteId(ServerWebExchange exchange) {
-        Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
-        return route == null ? null : route.getId();
-    }
 
     private boolean isInvalidScheme(URI url) {
         return url == null || !SCHEME.equals(url.getScheme());
@@ -244,11 +243,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
     @Nonnull
     Config getConfig(String routeId) {
-        if (routeId == null) {
-            logger.trace("No id of Route was found");
-            return DEFAULT_CONFIG;
-        }
-
         Map<String, Config> routedConfigs = this.routedConfigs;
         if (routedConfigs == null) {
             logger.trace("The routed configs was not initialized");
@@ -279,7 +273,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
                 Config config = createConfig(route);
                 routedConfigs.put(routeId, config);
                 Map<WebEndpointMapping, RequestMappingContext> mappedContexts = new HashMap<>();
-                getSubscribedServices(route, config)
+                getSubscribedServices(route.getUri(), config)
                         .stream()
                         .map(discoveryClient::getInstances)
                         // TODO support ZonePreferenceFilter
@@ -318,11 +312,10 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         return isSuccessRouteLocatorEvent(event);
     }
 
-    Collection<String> getSubscribedServices(Route route, Config config) {
+    List<String> getSubscribedServices(URI uri, Config config) {
         Set<String> excludedServices = config.exclude.getServices();
-        URI uri = route.getUri();
         String host = uri.getHost();
-        final Collection<String> services = new LinkedList<>();
+        final List<String> services = newArrayList();
         if (ALL_SERVICES.equals(host)) {
             services.addAll(discoveryClient.getServices());
         } else {
