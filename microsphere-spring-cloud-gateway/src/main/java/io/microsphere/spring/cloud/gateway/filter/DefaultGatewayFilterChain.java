@@ -21,6 +21,11 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import static io.microsphere.util.Assert.assertNoNullElements;
+import static io.microsphere.util.Assert.assertNotNull;
+import static reactor.core.publisher.Mono.defer;
+import static reactor.core.publisher.Mono.empty;
+
 /**
  * Default {@link GatewayFilterChain}
  *
@@ -36,7 +41,9 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
 
     private int position;
 
-    public DefaultGatewayFilterChain(GatewayFilter[] gatewayFilters) {
+    public DefaultGatewayFilterChain(GatewayFilter... gatewayFilters) {
+        assertNotNull(gatewayFilters, "The 'gatewayFilters' must not be null");
+        assertNoNullElements(gatewayFilters, "Any element of 'gatewayFilters' must not be null");
         this.gatewayFilters = gatewayFilters;
         this.length = gatewayFilters.length;
         this.position = 0;
@@ -46,8 +53,8 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
     public Mono<Void> filter(ServerWebExchange exchange) {
         if (position < length) {
             GatewayFilter gatewayFilter = this.gatewayFilters[position++];
-            return Mono.defer(() -> gatewayFilter.filter(exchange, this));
+            return defer(() -> gatewayFilter.filter(exchange, this));
         }
-        return Mono.empty();
+        return empty();
     }
 }

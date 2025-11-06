@@ -24,7 +24,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.handler.FilteringWebHandler;
 
-import static io.microsphere.spring.util.BeanRegistrar.registerBeanDefinition;
+import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
 
 /**
  * The {@link BeanDefinitionRegistryPostProcessor} for {@link FilteringWebHandler}
@@ -48,8 +48,7 @@ public class FilteringWebHandlerBeanDefinitionRegistryPostProcessor implements B
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         BeanDefinitionRegistry registry = this.registry;
-        String[] beanNames = beanFactory.getBeanNamesForType(FilteringWebHandler.class,
-                false, false);
+        String[] beanNames = beanFactory.getBeanNamesForType(FilteringWebHandler.class, false, false);
         for (String beanName : beanNames) {
             registry.removeBeanDefinition(beanName);
             registerBeanDefinition(registry, beanName, CachingFilteringWebHandler.class);
