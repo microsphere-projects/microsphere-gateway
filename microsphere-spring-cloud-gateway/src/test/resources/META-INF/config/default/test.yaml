@@ -1,0 +1,140 @@
+spring:
+  application:
+    name: test-app
+
+  # default disable all
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+        register-enabled: false
+      config:
+        import-check.enabled: false
+    zookeeper:
+      enabled: false
+    consul:
+      enabled: false
+    kubernetes:
+      enabled: false
+      config:
+        enabled: false
+        enableApi: false
+      secrets:
+        enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: nacos
+
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        enabled: true
+        register-enabled: true
+        server-addr: 127.0.0.1:8848
+        ephemeral: false
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: eureka
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka/
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: zookeeper
+  cloud:
+    zookeeper:
+      enabled: true
+      connect-string: 127.0.0.1:2181
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: consul
+
+  cloud:
+    consul:
+      enabled: true
+      host: 127.0.0.1
+      port: 8500
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: kubernetes
+
+  cloud:
+    kubernetes:
+      enabled: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: simple-service-registry
+
+microsphere:
+  spring:
+    cloud:
+      service-registry:
+        auto-registration:
+          simple:
+            enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: web-endpoint-mapping
+          uri: we://all
+          predicates:
+            - Path=/{application}/**
+          metadata:
+            web-endpoint:
+              exclude:
+                services: test-app-2
+                patterns: /test-2/**
+                methods: GET
+      server:
+        webflux:
+          routes:
+            - id: web-endpoint-mapping
+              uri: we://all
+              predicates:
+                - Path=/{application}/**
+              metadata:
+                web-endpoint:
+                  exclude:
+                    services: test-app-2
+                    patterns: /test-2/**
+                    methods: GET
