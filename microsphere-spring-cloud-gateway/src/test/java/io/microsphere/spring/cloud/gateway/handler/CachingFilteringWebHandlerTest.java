@@ -16,11 +16,17 @@
  */
 package io.microsphere.spring.cloud.gateway.handler;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
+import org.springframework.cloud.gateway.route.RouteLocator;
+
+import static io.microsphere.spring.cloud.gateway.handler.CachingFilteringWebHandler.EMPTY_FILTER_ARRAY;
+import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static reactor.core.publisher.Flux.empty;
 
 /**
  * {@link CachingFilteringWebHandler} Test
@@ -28,21 +34,45 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {
-                CachingFilteringWebHandlerTest.class
-        },
-        properties = {
-                "spring.config.import=classpath:/demo.yaml"
-        }
-)
-@EnableAutoConfiguration
 public class CachingFilteringWebHandlerTest {
 
-    @Test
-    public void test() {
+    private CachingFilteringWebHandler webHandler;
 
+    @BeforeEach
+    void setUp() {
+        this.webHandler = new CachingFilteringWebHandler(emptyList());
+    }
+
+    @Test
+    public void testDestroy() {
+        testOnRefreshRoutesResultEvent();
+        this.webHandler.destroy();
+    }
+
+    @Test
+    public void testDestroyWithoutInitialization() {
+        this.webHandler.destroy();
+    }
+
+    @Test
+    void testOnRefreshRoutesResultEvent() {
+        testOnRefreshRoutesResultEvent(null);
+    }
+
+    @Test
+    void testOnRefreshRoutesResultEventWithThrowable() {
+        testOnRefreshRoutesResultEvent(new Exception("For testing"));
+    }
+
+    @Test
+    void testGetRoutedGatewayFilters() {
+        assertSame(EMPTY_FILTER_ARRAY, this.webHandler.getRoutedGatewayFilters(null));
+    }
+
+    void testOnRefreshRoutesResultEvent(Throwable throwable) {
+        RouteLocator routeLocator = mock(RouteLocator.class);
+        when(routeLocator.getRoutes()).thenReturn(empty());
+        RefreshRoutesResultEvent event = new RefreshRoutesResultEvent(routeLocator, throwable);
+        this.webHandler.onRefreshRoutesResultEvent(event);
     }
 }

@@ -14,34 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.spring.cloud.gateway.loadbalancer;
 
-import org.springframework.lang.NonNull;
+package io.microsphere.spring.cloud.gateway.filter;
 
-import java.util.List;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import static reactor.core.publisher.Mono.empty;
 
 /**
- * Load Balancer API
+ * No-Op {@link GatewayFilter}
  *
- * @param <T> the type of element to be selected
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see GatewayFilter
  * @since 1.0.0
  */
-public interface LoadBalancer<T> {
+public class NoOpGatewayFilter implements GatewayFilter {
 
-    /**
-     * Choose one element from the collection
-     *
-     * @param elements elements collection
-     * @return <code>null</code> if not found
-     */
-    T choose(List<T> elements);
-
-    /**
-     * Get the name of load-balancer
-     *
-     * @return non-null
-     */
-    @NonNull
-    String getName();
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return empty();
+    }
 }
