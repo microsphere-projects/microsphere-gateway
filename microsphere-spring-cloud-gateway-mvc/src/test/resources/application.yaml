@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: test-app
+
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: simple-service-registry
+
+microsphere:
+  spring:
+    cloud:
+      service-registry:
+        auto-registration:
+          simple:
+            enabled: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: web-endpoint-mapping
+              uri: we://all
+              predicates:
+                - Path=/we/{application}/**
+              metadata:
+                web-endpoint:
+                  exclude:
+                    services: test-app-2
+                    patterns: /test-2/**
+                    methods: PUT
+            - id: web-endpoint-mapping-2
+              uri: we://test-app-2
+              predicates:
+                - Path=/wem/{application}/**
+              metadata:
+                web-endpoint:
+                  exclude:
+                    services: test-app-3
+                    patterns: /test-3/**
+                    methods: POST
+            - id: api_route
+              uri: lb://test-app
+              predicates:
+                - Path=/api/**
