@@ -33,7 +33,7 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * {@link WebEndpointMappingGatewayServerMvcAutoConfiguration} Test on disbled
+ * {@link WebEndpointMappingGatewayServerMvcAutoConfiguration} Test on disabled
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGatewayServerMvcAutoConfiguration
