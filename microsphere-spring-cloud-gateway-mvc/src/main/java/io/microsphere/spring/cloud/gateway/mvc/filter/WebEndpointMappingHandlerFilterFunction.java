@@ -26,10 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
 import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.HandlerFunction;
@@ -62,6 +60,7 @@ import static java.net.URI.create;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Stream.of;
+import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.GATEWAY_ROUTE_ID_ATTR;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.getAttribute;
 import static org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb;
@@ -83,11 +82,6 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
     private static final Logger logger = getLogger(WebEndpointMappingHandlerFilterFunction.class);
 
     /**
-     * The Web Endpoint scheme of the Routes' URI
-     */
-    public static final String SCHEME = "we";
-
-    /**
      * The all services for mapping
      */
     public static final String ALL_SERVICES = "all";
@@ -104,11 +98,8 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
     static final String NEW_PATH_ATTRIBUTE_NAME = "msg-new-path";
 
-    private final GatewayMvcProperties gatewayMvcProperties;
-
     private final DiscoveryClient discoveryClient;
 
-    private ConfigurableEnvironment environment;
 
     private ApplicationContext context;
 
@@ -118,8 +109,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
     private Config config;
 
-    public WebEndpointMappingHandlerFilterFunction(GatewayMvcProperties gatewayMvcProperties, DiscoveryClient discoveryClient) {
-        this.gatewayMvcProperties = gatewayMvcProperties;
+    public WebEndpointMappingHandlerFilterFunction(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
     }
 
@@ -127,6 +117,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
     public ServerResponse filter(ServerRequest request, HandlerFunction<ServerResponse> next) throws Exception {
         Map<String, String> uriTemplateVariables = request.pathVariables();
         String applicationName = uriTemplateVariables.get(APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME);
+        request.attributes().put(GATEWAY_REQUEST_URL_ATTR, request.uri());
 
         if (isBlank(applicationName)) {
             logger.trace("No application name was found by the request URL['{}'] with uriTemplateVariables : {}", request.path(), uriTemplateVariables);
@@ -135,19 +126,22 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
         RequestMappingContext requestMappingContext = getMatchingRequestMappingContext(applicationName, request);
 
-        if (requestMappingContext != null) {
-            HandlerFilterFunction<ServerResponse, ServerResponse> lbHandlerFunctionDefinition = lb(applicationName);
-            Map<String, Object> attributes = request.attributes();
-            String newPath = (String) attributes.remove(NEW_PATH_ATTRIBUTE_NAME);
-            int id = requestMappingContext.id;
-            ServerRequest newRequest = from(request)
-                    .uri(create(newPath))
-                    .header(ID_HEADER_NAME, valueOf(id))
-                    .build();
-            return lbHandlerFunctionDefinition.filter(newRequest, next);
+        if (requestMappingContext == null) {
+            return next.handle(request);
         }
 
-        return next.handle(request);
+        HandlerFilterFunction<ServerResponse, ServerResponse> lbHandlerFunctionDefinition = lb(applicationName);
+        Map<String, Object> attributes = request.attributes();
+        String newPath = (String) attributes.remove(NEW_PATH_ATTRIBUTE_NAME);
+        int id = requestMappingContext.id;
+        ServerRequest newRequest = from(request)
+                .uri(create(newPath))
+                .header(ID_HEADER_NAME, valueOf(id))
+                .build();
+
+        request.attributes().put(GATEWAY_REQUEST_URL_ATTR, newRequest.uri());
+
+        return lbHandlerFunctionDefinition.filter(newRequest, next);
     }
 
     public void setRouteProperties(RouteProperties routeProperties) {
@@ -170,7 +164,6 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         if (context != this.context) {
             return;
         }
-
 
         Config config = createConfig(routeProperties.getMetadata());
 

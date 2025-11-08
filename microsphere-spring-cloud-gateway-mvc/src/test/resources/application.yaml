@@ -5,6 +5,10 @@ spring:
 server:
   port: 8080
 
+eureka:
+  client:
+    enabled: false
+
 ---
 spring:
   config:
@@ -50,7 +54,3 @@ spring:
                     services: test-app-3
                     patterns: /test-3/**
                     methods: POST
-            - id: api_route
-              uri: lb://test-app
-              predicates:
-                - Path=/api/**

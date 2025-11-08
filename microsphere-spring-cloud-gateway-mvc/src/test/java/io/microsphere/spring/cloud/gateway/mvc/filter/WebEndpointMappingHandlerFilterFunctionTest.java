@@ -18,6 +18,7 @@
 package io.microsphere.spring.cloud.gateway.mvc.filter;
 
 
+import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
 import io.microsphere.spring.test.web.controller.TestController;
@@ -30,17 +31,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ConditionalOnBlockingDiscoveryEnabled;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryProperties;
+import org.springframework.cloud.client.serviceregistry.Registration;
+import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static io.microsphere.collection.Lists.ofList;
+import static io.microsphere.collection.Sets.ofSet;
+import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_PREFIX;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -84,18 +91,28 @@ class WebEndpointMappingHandlerFilterFunctionTest {
 
         @EventListener(RegistrationPreRegisteredEvent.class)
         public void onRegistrationPreRegisteredEvent(RegistrationPreRegisteredEvent event) {
+            register(event.getRegistration());
+        }
+
+        void register(Registration registration) {
             int localServerPort = this.environment.getProperty("local.server.port", int.class);
-            DefaultRegistration registration = (DefaultRegistration) event.getRegistration();
-            Map<String, List<DefaultServiceInstance>> instancesMap = new HashMap<>();
-            List<DefaultServiceInstance> instances = instancesMap.computeIfAbsent(registration.getServiceId(), k -> new ArrayList<>());
-            registration.setPort(localServerPort);
-            instances.add(registration);
-            instances.add(registration);
-            instances.add(registration);
-            simpleDiscoveryProperties.setInstances(instancesMap);
+            DefaultRegistration defaultRegistration = (DefaultRegistration) registration;
+            List<DefaultServiceInstance> instances = getInstances(registration.getServiceId());
+            defaultRegistration.setHost("127.0.0.1");
+            defaultRegistration.setPort(localServerPort);
+            instances.add(defaultRegistration);
+        }
+
+        void deregister(Registration registration) {
+            String serviceId = registration.getServiceId();
+            List<DefaultServiceInstance> instances = getInstances(serviceId);
+            instances.removeIf(instance -> instance.getServiceId().equals(serviceId));
+        }
+
+        List<DefaultServiceInstance> getInstances(String serviceId) {
+            return simpleDiscoveryProperties.getInstances().computeIfAbsent(serviceId, k -> new ArrayList<>());
         }
     }
-
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -103,25 +120,45 @@ class WebEndpointMappingHandlerFilterFunctionTest {
     @Autowired
     private TestController testController;
 
+    @Autowired
+    private TestConfig testConfig;
+
+    @Autowired
+    private Registration registration;
+
     private MockMvc mockMvc;
+
 
     @BeforeEach
     void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
-
     @Test
     public void test() throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+        String content = restTemplate.getForObject(this.registration.getUri() + "/test/helloworld", String.class);
+        assertEquals(this.testController.helloWorld(), content);
         this.mockMvc.perform(get("/we/test-app/test/helloworld"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(this.testController.helloWorld()));
+
+
+        EnvironmentChangeEvent event = new EnvironmentChangeEvent(ofSet(GATEWAY_ROUTES_PROPERTY_PREFIX + "[0].id"));
+        webApplicationContext.publishEvent(event);
+        this.mockMvc.perform(get("/we/test-app/test/helloworld"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(this.testController.helloWorld()));
+
+        this.testConfig.deregister(this.registration);
+
+        this.webApplicationContext.publishEvent(new ServiceInstancesChangedEvent(this.registration.getServiceId(), ofList(this.registration)));
+
+        assertThrows(Exception.class, () -> this.mockMvc.perform(get("/we/test-app/test/helloworld")));
     }
 
     @Test
-    public void testLoadBalancer() throws Exception {
-        this.mockMvc.perform(get("/api/test/helloworld"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(this.testController.helloWorld()));
+    public void testOnNotFound() {
+        assertThrows(Exception.class, () -> this.mockMvc.perform(get("/we/ /test/helloworld")));
     }
 }

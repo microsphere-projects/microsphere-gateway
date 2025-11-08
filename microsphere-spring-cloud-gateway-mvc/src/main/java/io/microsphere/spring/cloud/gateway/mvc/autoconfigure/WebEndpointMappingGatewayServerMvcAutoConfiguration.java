@@ -17,6 +17,7 @@
 package io.microsphere.spring.cloud.gateway.mvc.autoconfigure;
 
 import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
+import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.gateway.mvc.annotation.ConditionalOnGatewayServerMvcEnabled;
 import io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -82,9 +83,8 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
     @Bean
     @ConditionalOnBean(value = {GatewayMvcProperties.class, DiscoveryClient.class})
     @Scope(SCOPE_PROTOTYPE)
-    public WebEndpointMappingHandlerFilterFunction webEndpointMappingHandlerFilterFunction(GatewayMvcProperties gatewayMvcProperties,
-                                                                                           DiscoveryClient discoveryClient) {
-        return new WebEndpointMappingHandlerFilterFunction(gatewayMvcProperties, discoveryClient);
+    public WebEndpointMappingHandlerFilterFunction webEndpointMappingHandlerFilterFunction(DiscoveryClient discoveryClient) {
+        return new WebEndpointMappingHandlerFilterFunction(discoveryClient);
     }
 
     @Bean
@@ -131,7 +131,8 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
         @Override
         public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
             return EnvironmentChangeEvent.class.isAssignableFrom(eventType)
-                    || ContextRefreshedEvent.class.isAssignableFrom(eventType);
+                    || ContextRefreshedEvent.class.isAssignableFrom(eventType)
+                    || ServiceInstancesChangedEvent.class.isAssignableFrom(eventType);
         }
 
         @Override
@@ -140,30 +141,28 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
                 this.function.refresh(this.routeProperties, contextRefreshedEvent.getApplicationContext());
             } else if (event instanceof EnvironmentChangeEvent environmentChangeEvent) {
                 onEnvironmentChangeEvent(environmentChangeEvent);
+            } else if (event instanceof ServiceInstancesChangedEvent) {
+                this.function.refresh(this.routeProperties, this.context);
             }
         }
 
         public void onEnvironmentChangeEvent(EnvironmentChangeEvent event) {
-            String prefix = findRoutePropertyPrefix(event.getKeys());
-            if (prefix == null) {
-                return;
+            if (matches(event.getKeys())) {
+                this.function.refresh(this.routeProperties, this.context);
             }
-            this.function.refresh(this.routeProperties, this.context);
         }
 
-        private String findRoutePropertyPrefix(Set<String> keys) {
+        private boolean matches(Set<String> keys) {
             for (String key : keys) {
                 if (startsWith(key, GATEWAY_ROUTES_PROPERTY_PREFIX)) {
                     int lastIndex = key.lastIndexOf(".id");
-                    if (lastIndex == key.length() - 4) {
+                    if (lastIndex > -1) {
                         String propertyValue = this.environment.getProperty(key);
-                        if (this.routeProperties.getId().equals(propertyValue)) {
-                            return propertyValue.substring(0, lastIndex);
-                        }
+                        return this.routeProperties.getId().equals(propertyValue);
                     }
                 }
             }
-            return null;
+            return false;
         }
     }
 }
