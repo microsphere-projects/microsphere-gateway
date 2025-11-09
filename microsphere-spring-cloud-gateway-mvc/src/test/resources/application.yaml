@@ -31,6 +31,28 @@ spring:
       on-profile: gateway
   cloud:
     gateway:
+      mvc:
+        routes:
+          - id: web-endpoint-mapping
+            uri: we://all
+            predicates:
+              - Path=/we/{application}/**
+            metadata:
+              web-endpoint:
+                exclude:
+                  services: test-app-2
+                  patterns: /test-2/**
+                  methods: PUT
+          - id: web-endpoint-mapping-2
+            uri: we://test-app-2
+            predicates:
+              - Path=/wem/{application}/**
+            metadata:
+              web-endpoint:
+                exclude:
+                  services: test-app-3
+                  patterns: /test-3/**
+                  methods: POST
       server:
         webmvc:
           routes:

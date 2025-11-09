@@ -18,17 +18,12 @@
 package io.microsphere.spring.cloud.gateway.mvc.autoconfigure;
 
 
-import io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction;
+import io.microsphere.spring.cloud.gateway.mvc.autoconfigure.WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;
-import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctionDefinition;
 import org.springframework.test.annotation.DirtiesContext;
-
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -52,15 +47,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class WebEndpointMappingGatewayServerMvcAutoConfigurationTest {
 
     @Autowired
-    private WebEndpointMappingHandlerFilterFunction webEndpointMappingHandlerFilterFunction;
-
-    @Autowired
-    @Qualifier("weHandlerFunctionDefinition")
-    private Function<RouteProperties, HandlerFunctionDefinition> weHandlerFunctionDefinition;
+    private WebEndpointMappingHandlerConfig webEndpointMappingHandlerConfig;
 
     @Test
     void test() {
-        assertNotNull(webEndpointMappingHandlerFilterFunction);
-        assertNotNull(weHandlerFunctionDefinition);
+        assertNotNull(webEndpointMappingHandlerConfig);
     }
 }

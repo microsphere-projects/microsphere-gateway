@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -86,6 +87,8 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
      */
     public static final String ALL_SERVICES = "all";
 
+    public static final String SCHEME = "we";
+
     /**
      * The key of {@link Config} under {@link RouteProperties#getMetadata() Routes' Metadata}
      */
@@ -98,19 +101,20 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
     static final String NEW_PATH_ATTRIBUTE_NAME = "msg-new-path";
 
-    private final DiscoveryClient discoveryClient;
-
-
-    private ApplicationContext context;
-
     private RouteProperties routeProperties;
+
+    @Nonnull
+    private DiscoveryClient discoveryClient;
+
+    @Nonnull
+    private ApplicationContext context;
 
     private Collection<RequestMappingContext> requestMappingContexts = new LinkedList<>();
 
     private Config config;
 
-    public WebEndpointMappingHandlerFilterFunction(DiscoveryClient discoveryClient) {
-        this.discoveryClient = discoveryClient;
+    public WebEndpointMappingHandlerFilterFunction(final RouteProperties routeProperties) {
+        this.routeProperties = routeProperties;
     }
 
     @Override
@@ -144,12 +148,9 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         return lbHandlerFunctionDefinition.filter(newRequest, next);
     }
 
-    public void setRouteProperties(RouteProperties routeProperties) {
-        this.routeProperties = routeProperties;
-    }
-
     public void setApplicationContext(ApplicationContext context) {
         this.context = context;
+        this.discoveryClient = context.getBean(DiscoveryClient.class);
     }
 
     public void refresh(RouteProperties routeProperties, ApplicationContext context) {
@@ -157,7 +158,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
             return;
         }
 
-        if (routeProperties != this.routeProperties) {
+        if (!Objects.equals(routeProperties, this.routeProperties)) {
             return;
         }
 
@@ -184,9 +185,9 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         Collection<RequestMappingContext> requestMappingContexts = mappedContexts.values();
 
         synchronized (routeProperties) {
-            this.routeProperties = routeProperties;
             this.config = config;
             this.requestMappingContexts = requestMappingContexts;
+            this.routeProperties = routeProperties;
             logger.trace("The route properties, configs and request mapping contexts were refreshed!");
         }
     }

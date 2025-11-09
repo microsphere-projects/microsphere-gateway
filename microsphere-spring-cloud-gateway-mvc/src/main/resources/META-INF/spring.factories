@@ -1,0 +1,2 @@
+org.springframework.cloud.gateway.server.mvc.handler.HandlerSupplier=\
+io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerSupplier

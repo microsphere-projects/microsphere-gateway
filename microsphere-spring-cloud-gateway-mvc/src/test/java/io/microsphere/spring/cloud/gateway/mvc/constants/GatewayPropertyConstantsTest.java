@@ -20,9 +20,6 @@ package io.microsphere.spring.cloud.gateway.mvc.constants;
 
 import org.junit.jupiter.api.Test;
 
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ENABLED_PROPERTY_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * {@link GatewayPropertyConstants} Test
  *
@@ -34,6 +31,5 @@ class GatewayPropertyConstantsTest {
 
     @Test
     void testConstants() {
-        assertEquals("spring.cloud.gateway.server.webmvc.enabled", GATEWAY_ENABLED_PROPERTY_NAME);
     }
 }

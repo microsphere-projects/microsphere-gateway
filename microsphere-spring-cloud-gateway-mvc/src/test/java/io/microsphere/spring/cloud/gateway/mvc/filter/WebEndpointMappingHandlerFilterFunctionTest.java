@@ -33,6 +33,7 @@ import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
@@ -82,6 +83,9 @@ class WebEndpointMappingHandlerFilterFunctionTest {
 
         @Autowired
         private Environment environment;
+
+        @Autowired
+        private ApplicationContext context;
 
         private final SimpleDiscoveryProperties simpleDiscoveryProperties;
 
