@@ -20,7 +20,6 @@ package io.microsphere.spring.cloud.gateway.filter;
 
 import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
-import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config;
 import io.microsphere.spring.test.web.controller.TestController;
 import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,16 +41,18 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config.DEFAULT_CONFIG;
+import static io.microsphere.collection.CollectionUtils.first;
 import static java.net.URI.create;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext;
 
 /**
@@ -132,17 +133,30 @@ class WebEndpointMappingGlobalFilterTest {
                 .expectBody(String.class)
                 .isEqualTo(testController.helloWorld());
 
+        this.webTestClient.get().uri("/test-1/test/helloworld")
+                .exchange()
+                .expectStatus().isOk();
+
+        this.webTestClient.get().uri("/test-2/test/helloworld")
+                .exchange()
+                .expectStatus().isOk();
+
+        this.webTestClient.get().uri("/test-3/abc/def")
+                .header(CONTENT_TYPE, "application/json")
+                .header(ACCEPT, "plain/text")
+                .exchange()
+                .expectStatus().isOk();
+
         URI uri = create("we://test-app");
-        Config config = this.filter.getConfig("not-found");
-        List<String> subscribedServices = this.filter.getSubscribedServices(uri, config);
+        Collection<String> subscribedServices = this.filter.getSubscribedServices(uri);
         assertEquals(1, subscribedServices.size());
-        assertEquals("test-app", subscribedServices.get(0));
+        assertEquals("test-app", first(subscribedServices));
     }
 
     @Test
     @Order(2)
     void testFilterForUnregisteredApplication() {
-        this.webTestClient.get().uri("/test-2/test/helloworld")
+        this.webTestClient.get().uri("/test-0/test/helloworld")
                 .exchange()
                 .expectStatus().isOk();
 
@@ -157,8 +171,6 @@ class WebEndpointMappingGlobalFilterTest {
         this.webTestClient.get().uri("/test-app/test/helloworld")
                 .exchange()
                 .expectStatus().isOk();
-
-        assertSame(DEFAULT_CONFIG, this.filter.getConfig(null));
     }
 
     @Test
@@ -169,5 +181,23 @@ class WebEndpointMappingGlobalFilterTest {
                 .expectStatus().isOk()
                 .expectBody(String.class)
                 .isEqualTo(testController.helloWorld());
+    }
+
+    @Test
+    @Order(5)
+    void testFilterForExcludedRequests() {
+        this.webTestClient.get().uri("/test-1/test/helloworld")
+                .exchange()
+                .expectStatus().isOk();
+
+        this.webTestClient.get().uri("/test-2/test/helloworld")
+                .exchange()
+                .expectStatus().isOk();
+
+        this.webTestClient.get().uri("/test-3/abc/def")
+                .header(CONTENT_TYPE, "application/json")
+                .header(ACCEPT, "plain/text")
+                .exchange()
+                .expectStatus().isOk();
     }
 }

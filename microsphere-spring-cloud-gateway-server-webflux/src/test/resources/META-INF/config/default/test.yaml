@@ -121,10 +121,13 @@ spring:
             - Path=/{application}/**
           metadata:
             web-endpoint:
-              exclude:
-                services: test-app-2
-                patterns: /test-2/**
-                methods: GET
+              excludes:
+                - patterns: /test-1/**
+                - patterns: /test-2/**
+                  methods: GET
+                - patterns: /test-3/abc/**
+                  consumes: application/json
+                  produces: plain/text
       server:
         webflux:
           routes:
@@ -134,7 +137,10 @@ spring:
                 - Path=/{application}/**
               metadata:
                 web-endpoint:
-                  exclude:
-                    services: test-app-2
-                    patterns: /test-2/**
-                    methods: GET
+                  excludes:
+                    - patterns: /test-1/**
+                    - patterns: /test-2/**
+                      methods: GET
+                    - patterns: /test-3/abc/**
+                      consumes: application/json
+                      produces: plain/text

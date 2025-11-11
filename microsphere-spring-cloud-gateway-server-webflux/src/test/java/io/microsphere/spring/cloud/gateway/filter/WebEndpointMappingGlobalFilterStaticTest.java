@@ -17,9 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.filter;
 
-import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config;
-import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.RequestMappingContext;
-import io.microsphere.spring.web.metadata.WebEndpointMapping;
 import org.junit.jupiter.api.Test;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
@@ -28,43 +25,18 @@ import java.net.URI;
 
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.buildPath;
-import static io.microsphere.spring.web.metadata.WebEndpointMapping.Kind.WEB_FLUX;
-import static io.microsphere.spring.web.metadata.WebEndpointMapping.of;
 import static java.net.URI.create;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * {@link WebEndpointMappingGlobalFilter} Static staff Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGlobalFilter
- * @see WebEndpointMappingGlobalFilter.Config
  * @see WebEndpointMappingGlobalFilter.RequestMappingContext
  * @since 1.0.0
  */
 public class WebEndpointMappingGlobalFilterStaticTest {
-
-    @Test
-    void testConfigWithDefaults() {
-        Config config = new Config();
-        config.init();
-        assertFalse(config.isExcludedRequest(null));
-    }
-
-    @Test
-    void testRequestMappingContext() {
-        WebEndpointMapping mapping = of(WEB_FLUX)
-                .endpoint(this)
-                .pattern("/test")
-                .method("GET")
-                .build();
-        RequestMappingContext context = new RequestMappingContext(mapping);
-
-        ServiceInstance serviceInstance = createServiceInstance();
-        context.addServiceInstance(serviceInstance);
-        context.addServiceInstance(serviceInstance);
-    }
 
     @Test
     void testBuildPath() {

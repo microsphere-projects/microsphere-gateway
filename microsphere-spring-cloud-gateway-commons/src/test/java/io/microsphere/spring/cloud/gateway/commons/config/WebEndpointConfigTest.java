@@ -33,11 +33,13 @@ import java.io.IOException;
 import java.util.List;
 
 import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
+import static io.microsphere.util.ArrayUtils.EMPTY_STRING_ARRAY;
 import static io.microsphere.util.ArrayUtils.ofArray;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.boot.context.properties.source.ConfigurationPropertySources.attach;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -81,7 +83,7 @@ class WebEndpointConfigTest {
         assertArrayEquals(ofArray("/test-1/**"), exclude.getPatterns());
         assertArrayEquals(ofArray(GET), exclude.getMethods());
         assertArrayEquals(ofArray("p=1"), exclude.getParams());
-        assertNull(exclude.getHeaders());
+        assertSame(EMPTY_STRING_ARRAY, exclude.getHeaders());
         assertNull(exclude.getConsumes());
         assertNull(exclude.getProduces());
 
@@ -97,7 +99,7 @@ class WebEndpointConfigTest {
         assertArrayEquals(ofArray("/test-3/abc/**"), exclude.getPatterns());
         assertArrayEquals(RequestMethod.values(), exclude.getMethods());
         assertNull(exclude.getParams());
-        assertNull(exclude.getHeaders());
+        assertSame(EMPTY_STRING_ARRAY, exclude.getHeaders());
         assertArrayEquals(ofArray("application/json"), exclude.getConsumes());
         assertArrayEquals(ofArray("plain/text"), exclude.getProduces());
 

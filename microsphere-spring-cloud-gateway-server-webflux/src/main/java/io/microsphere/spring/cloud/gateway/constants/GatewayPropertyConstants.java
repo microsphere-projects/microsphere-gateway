@@ -36,4 +36,11 @@ public interface GatewayPropertyConstants {
      * @see GatewayProperties#PREFIX
      */
     String GATEWAY_ENABLED_PROPERTY_NAME = PREFIX + DOT + ENABLED_PROPERTY_NAME;
+
+    /**
+     * The property name prefix of Gateway {@link GatewayProperties#getRoutes() Routes}
+     *
+     * @see GatewayProperties#getRoutes()
+     */
+    String GATEWAY_ROUTES_PROPERTY_NAME_PREFIX = PREFIX + DOT + "routes";
 }

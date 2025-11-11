@@ -16,25 +16,31 @@
  */
 package io.microsphere.spring.cloud.gateway.filter;
 
-import io.microsphere.annotation.Nonnull;
 import io.microsphere.logging.Logger;
-import io.microsphere.spring.boot.context.config.BindableConfigurationBeanBinder;
-import io.microsphere.spring.context.config.ConfigurationBeanBinder;
+import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig;
+import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig.Mapping;
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.Response;
+import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
+import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.event.RefreshRoutesResultEvent;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.ReactiveLoadBalancerClientFilter;
 import org.springframework.cloud.gateway.route.Route;
-import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.loadbalancer.core.ReactorLoadBalancer;
 import org.springframework.cloud.loadbalancer.core.ReactorServiceInstanceLoadBalancer;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -45,31 +51,30 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.microsphere.collection.ListUtils.first;
 import static io.microsphere.collection.ListUtils.newArrayList;
-import static io.microsphere.collection.PropertiesUtils.flatProperties;
 import static io.microsphere.constants.PathConstants.SLASH_CHAR;
+import static io.microsphere.lang.function.Streams.filterFirst;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.net.URLUtils.buildURI;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getUriString;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
-import static io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter.Config.DEFAULT_CONFIG;
+import static io.microsphere.spring.cloud.gateway.autoconfigure.WebEndpointMappingGatewayAutoConfiguration.ROUTE_METADATA_WEB_ENDPOINT_KEY;
 import static io.microsphere.spring.cloud.gateway.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.spring.web.util.MonoUtils.getValue;
-import static io.microsphere.util.ArrayUtils.isNotEmpty;
 import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.substringAfter;
 import static java.lang.String.valueOf;
 import static java.net.URI.create;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Stream.of;
 import static org.springframework.cloud.gateway.filter.ReactiveLoadBalancerClientFilter.LOAD_BALANCER_CLIENT_FILTER_ORDER;
@@ -87,7 +92,7 @@ import static org.springframework.web.reactive.result.method.RequestMappingInfo.
  * @see ReactiveLoadBalancerClientFilter
  * @since 1.0.0
  */
-public class WebEndpointMappingGlobalFilter implements GlobalFilter, ApplicationListener<RefreshRoutesResultEvent>,
+public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplicationListener, ApplicationContextAware,
         DisposableBean, Ordered {
 
     private static final Logger logger = getLogger(WebEndpointMappingGlobalFilter.class);
@@ -103,11 +108,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     public static final String ALL_SERVICES = "all";
 
     /**
-     * The key of the {@link Route#getMetadata() Routes' Metadata}
-     */
-    public static final String METADATA_KEY = "web-endpoint";
-
-    /**
      * The URI template variable name for application name
      */
     public static final String APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME = "application";
@@ -118,14 +118,19 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
     private final LoadBalancerClientFactory clientFactory;
 
-    volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = null;
+    private final GatewayProperties gatewayProperties;
 
-    volatile Map<String, Config> routedConfigs = null;
+    private ApplicationContext context;
+
+    volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContextsCache = null;
+
+    volatile Map<String, Collection<RequestMappingInfo>> routedExcludedRequestMappingInfoCache = null;
 
     public WebEndpointMappingGlobalFilter(DiscoveryClient discoveryClient,
-                                          LoadBalancerClientFactory clientFactory) {
+                                          LoadBalancerClientFactory clientFactory, GatewayProperties gatewayProperties) {
         this.discoveryClient = discoveryClient;
         this.clientFactory = clientFactory;
+        this.gatewayProperties = gatewayProperties;
     }
 
     @Override
@@ -164,6 +169,112 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         return chain.filter(exchange);
     }
 
+    @Override
+    public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
+        return ContextRefreshedEvent.class.equals(eventType)
+                || RefreshRoutesResultEvent.class.equals(eventType)
+                || EnvironmentChangeEvent.class.equals(eventType);
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationEvent event) {
+        if (event instanceof ContextRefreshedEvent contextRefreshedEvent) {
+            onContextRefreshedEvent(contextRefreshedEvent);
+        } else if (event instanceof RefreshRoutesResultEvent refreshRoutesResultEvent) {
+            onRefreshRoutesResultEvent(refreshRoutesResultEvent);
+        } else if (event instanceof EnvironmentChangeEvent environmentChangeEvent) {
+            onEnvironmentChangeEvent(environmentChangeEvent);
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
+    }
+
+    @Override
+    public void destroy() {
+        clear(this.routedRequestMappingContextsCache);
+        clear(this.routedExcludedRequestMappingInfoCache);
+    }
+
+    @Override
+    public int getOrder() {
+        return LOAD_BALANCER_CLIENT_FILTER_ORDER - 1;
+    }
+
+    private void onContextRefreshedEvent(ContextRefreshedEvent event) {
+        if (this.context == event.getApplicationContext()) {
+            refresh();
+        }
+    }
+
+    private void onRefreshRoutesResultEvent(RefreshRoutesResultEvent event) {
+        if (matchesEvent(event)) {
+            refresh();
+        }
+    }
+
+    private void onEnvironmentChangeEvent(EnvironmentChangeEvent event) {
+        refresh();
+    }
+
+    private void refresh() {
+        Map<String, Collection<RequestMappingContext>> routedRequestMappingContextsCache = new ConcurrentHashMap<>();
+        Map<String, Collection<RequestMappingInfo>> routedExcludedRequestMappingInfoCache = new ConcurrentHashMap<>();
+        List<RouteDefinition> routes = this.gatewayProperties.getRoutes();
+
+        for (RouteDefinition route : routes) {
+            URI routeUri = route.getUri();
+            if (isWebEndpointRoute(routeUri)) {
+                String routeId = route.getId();
+                Collection<RequestMappingContext> requestMappingContexts = buildRequestMappingContexts(routeUri);
+                routedRequestMappingContextsCache.put(routeId, requestMappingContexts);
+
+                Set<RequestMappingInfo> requestMappingInfoSet = buildExcludedRequestMappingInfoSet(routes, routeId);
+                routedExcludedRequestMappingInfoCache.put(routeId, requestMappingInfoSet);
+            }
+        }
+
+        // exchange
+        synchronized (this) {
+            this.routedRequestMappingContextsCache = routedRequestMappingContextsCache;
+            this.routedExcludedRequestMappingInfoCache = routedExcludedRequestMappingInfoCache;
+        }
+    }
+
+    private Set<RequestMappingInfo> buildExcludedRequestMappingInfoSet(List<RouteDefinition> routes, String routeId) {
+        WebEndpointConfig webEndpointConfig = findWebEndpointConfig(routes, routeId);
+
+        List<Mapping> excludes = webEndpointConfig.getExcludes();
+        Set<RequestMappingInfo> requestMappingInfoSet = new HashSet<>(excludes.size());
+        for (Mapping exclude : excludes) {
+            requestMappingInfoSet.add(buildRequestMappingInfo(exclude));
+        }
+        return requestMappingInfoSet;
+    }
+
+    private Collection<RequestMappingContext> buildRequestMappingContexts(URI routeUri) {
+        Collection<String> subscribedServices = getSubscribedServices(routeUri);
+        Collection<RequestMappingContext> requestMappingContexts = new LinkedList<>();
+        // TODO support ZonePreferenceFilter
+        for (String subscribedService : subscribedServices) {
+            ServiceInstance sampleServiceInstance = choose(subscribedService);
+            Collection<WebEndpointMapping> webEndpointMappings = getWebEndpointMappings(sampleServiceInstance);
+            for (WebEndpointMapping webEndpointMapping : webEndpointMappings) {
+                RequestMappingContext requestMappingContext = new RequestMappingContext(webEndpointMapping);
+                requestMappingContexts.add(requestMappingContext);
+            }
+        }
+        return requestMappingContexts;
+    }
+
+    private WebEndpointConfig findWebEndpointConfig(List<RouteDefinition> routes, String routeId) {
+        RouteDefinition routeDefinition = filterFirst(routes, def -> routeId.equals(def.getId()));
+        Map<String, Object> metadata = routeDefinition.getMetadata();
+        return (WebEndpointConfig) metadata.get(ROUTE_METADATA_WEB_ENDPOINT_KEY);
+    }
+
     private ServiceInstance choose(String applicationName) {
         ReactorLoadBalancer<ServiceInstance> loadBalancer = this.clientFactory.getInstance(applicationName, ReactorServiceInstanceLoadBalancer.class);
         Mono<Response<ServiceInstance>> mono = loadBalancer.choose();
@@ -184,7 +295,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
             return null;
         }
 
-        Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = this.routedRequestMappingContexts;
+        Map<String, Collection<RequestMappingContext>> routedRequestMappingContexts = this.routedRequestMappingContextsCache;
 
         if (routedRequestMappingContexts == null) {
             // No RequestMappingContexts for routing
@@ -222,9 +333,8 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         return first(matchesRequestMappings);
     }
 
-
     private boolean isInvalidScheme(URI url) {
-        return url == null || !SCHEME.equals(url.getScheme());
+        return !isWebEndpointRoute(url);
     }
 
     private boolean matchesRequestMapping(ServerWebExchange exchange, RequestMappingContext requestMappingContext) {
@@ -233,166 +343,36 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
     }
 
     private boolean isExcludedRequest(String routeId, ServerWebExchange exchange) {
-        Config config = getConfig(routeId);
-        return config.isExcludedRequest(exchange);
-    }
-
-    @Nonnull
-    Config getConfig(String routeId) {
-        Map<String, Config> routedConfigs = this.routedConfigs;
-        if (routedConfigs == null) {
-            logger.trace("The routed configs was not initialized");
-            return DEFAULT_CONFIG;
-        }
-
-        Config config = routedConfigs.get(routeId);
-        if (config == null) {
-            logger.trace("No routed config was found by id : '{}'", routeId);
-            return DEFAULT_CONFIG;
-        }
-        return config;
-    }
-
-    @Override
-    public int getOrder() {
-        return LOAD_BALANCER_CLIENT_FILTER_ORDER - 1;
-    }
-
-    @Override
-    public void onApplicationEvent(RefreshRoutesResultEvent event) {
-        if (matchesEvent(event)) {
-            Map<String, Collection<RequestMappingContext>> routedContexts = new HashMap<>();
-            Map<String, Config> routedConfigs = new HashMap<>();
-            RouteLocator routeLocator = (RouteLocator) event.getSource();
-            routeLocator.getRoutes().filter(this::isWebEndpointRoute).subscribe((route -> {
-                String routeId = route.getId();
-                Config config = createConfig(route);
-                routedConfigs.put(routeId, config);
-                Map<WebEndpointMapping, RequestMappingContext> mappedContexts = new HashMap<>();
-                getSubscribedServices(route.getUri(), config)
-                        .stream()
-                        .map(discoveryClient::getInstances)
-                        // TODO support ZonePreferenceFilter
-                        .flatMap(List::stream)
-                        .forEach(serviceInstance -> {
-                            getWebEndpointMappings(serviceInstance)
-                                    .stream()
-                                    .forEach(webEndpointMapping -> {
-                                        RequestMappingContext requestMappingContext = mappedContexts.computeIfAbsent(webEndpointMapping, RequestMappingContext::new);
-                                        requestMappingContext.addServiceInstance(serviceInstance);
-                                    });
-                        });
-                routedContexts.put(routeId, mappedContexts.values());
-            })).dispose();
-
-            // exchange
-            synchronized (this) {
-                this.routedRequestMappingContexts = routedContexts;
-                this.routedConfigs = routedConfigs;
+        Collection<RequestMappingInfo> excludedRequestMappingInfoSet = routedExcludedRequestMappingInfoCache.getOrDefault(routeId, emptySet());
+        for (RequestMappingInfo excludedRequestMappingInfo : excludedRequestMappingInfoSet) {
+            if (excludedRequestMappingInfo.getMatchingCondition(exchange) != null) {
+                return true;
             }
         }
-    }
-
-    Config createConfig(Route route) {
-        Map<String, Object> metadata = route.getMetadata();
-        Config config = new Config();
-        Map<String, Object> properties = (Map) metadata.getOrDefault(METADATA_KEY, emptyMap());
-        Map<String, Object> flatProperties = flatProperties(properties);
-        ConfigurationBeanBinder beanBinder = new BindableConfigurationBeanBinder();
-        beanBinder.bind(flatProperties, true, true, config);
-        config.init();
-        return config;
+        return false;
     }
 
     private boolean matchesEvent(RefreshRoutesResultEvent event) {
         return isSuccessRouteLocatorEvent(event);
     }
 
-    List<String> getSubscribedServices(URI uri, Config config) {
-        Set<String> excludedServices = config.exclude.getServices();
-        String host = uri.getHost();
-        final List<String> services = newArrayList();
+    Collection<String> getSubscribedServices(URI routeUri) {
+        String host = routeUri.getHost();
         if (ALL_SERVICES.equals(host)) {
-            services.addAll(discoveryClient.getServices());
-        } else {
-            services.addAll(commaDelimitedListToSet(host));
+            return discoveryClient.getServices();
         }
-        services.removeAll(excludedServices);
-        return services;
+        return commaDelimitedListToSet(host);
     }
 
-    private boolean isWebEndpointRoute(Route route) {
-        URI uri = route.getUri();
-        return SCHEME.equals(uri.getScheme());
-    }
-
-    @Override
-    public void destroy() {
-        if (this.routedRequestMappingContexts != null) {
-            this.routedRequestMappingContexts.clear();
-        }
-        if (this.routedConfigs != null) {
-            this.routedConfigs.clear();
-        }
+    private boolean isWebEndpointRoute(URI routeUri) {
+        return routeUri != null && SCHEME.equals(routeUri.getScheme());
     }
 
     /**
      * Clear for testing
      */
     void clear() {
-        this.routedRequestMappingContexts = null;
-        this.routedConfigs = null;
-    }
-
-    static class Config {
-
-        static final Config DEFAULT_CONFIG = new Config();
-
-        Exclude exclude = new Exclude();
-
-        RequestMappingInfo excludeRequestMappingInfo;
-
-        public void setExclude(Exclude exclude) {
-            this.exclude = exclude;
-        }
-
-        public void init() {
-            Exclude exclude = this.exclude;
-            String[] patterns = exclude.patterns;
-            if (isNotEmpty(patterns)) {
-                this.excludeRequestMappingInfo = paths(patterns).methods(exclude.methods).build();
-            }
-        }
-
-        boolean isExcludedRequest(ServerWebExchange exchange) {
-            return excludeRequestMappingInfo == null ? false :
-                    excludeRequestMappingInfo.getMatchingCondition(exchange) != null;
-        }
-
-        static class Exclude {
-
-            Set<String> services;
-
-            String[] patterns;
-
-            RequestMethod[] methods;
-
-            public Set<String> getServices() {
-                return services == null ? emptySet() : services;
-            }
-
-            public void setServices(Set<String> services) {
-                this.services = services;
-            }
-
-            public void setPatterns(String[] patterns) {
-                this.patterns = patterns;
-            }
-
-            public void setMethods(RequestMethod[] methods) {
-                this.methods = methods;
-            }
-        }
+        this.routedRequestMappingContextsCache = null;
     }
 
     static class RequestMappingContext {
@@ -401,15 +381,9 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
 
         private int id;
 
-        private List<ServiceInstance> serviceInstances = new LinkedList<>();
-
         RequestMappingContext(WebEndpointMapping webEndpointMapping) {
             this.requestMappingInfo = buildRequestMappingInfo(webEndpointMapping);
             this.id = webEndpointMapping.getId();
-        }
-
-        void addServiceInstance(ServiceInstance serviceInstance) {
-            this.serviceInstances.add(serviceInstance);
         }
 
         public int compareTo(RequestMappingContext other, ServerWebExchange exchange) {
@@ -433,6 +407,16 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
         return buildURI(contextPath, path.substring(servicePath.length()));
     }
 
+    private static RequestMappingInfo buildRequestMappingInfo(Mapping mapping) {
+        return paths(mapping.getPatterns())
+                .methods(mapping.getMethods())
+                .params(mapping.getParams())
+                .headers(mapping.getHeaders())
+                .consumes(mapping.getConsumes())
+                .produces(mapping.getProduces())
+                .build();
+    }
+
     private static RequestMappingInfo buildRequestMappingInfo(WebEndpointMapping webEndpointMapping) {
         RequestMethod[] methods = buildRequestMethods(webEndpointMapping);
         return paths(webEndpointMapping.getPatterns())
@@ -442,12 +426,17 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, Application
                 .consumes(webEndpointMapping.getConsumes())
                 .produces(webEndpointMapping.getProduces())
                 .build();
-
     }
 
     private static RequestMethod[] buildRequestMethods(WebEndpointMapping webEndpointMapping) {
         return of(webEndpointMapping.getMethods())
                 .map(RequestMethod::valueOf)
                 .toArray(RequestMethod[]::new);
+    }
+
+    static void clear(Map<?, ?> map) {
+        if (map != null) {
+            map.clear();
+        }
     }
 }

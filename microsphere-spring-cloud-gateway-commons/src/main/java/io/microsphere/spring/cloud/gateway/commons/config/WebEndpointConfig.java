@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.LinkedList;
 import java.util.List;
 
+import static io.microsphere.util.ArrayUtils.EMPTY_STRING_ARRAY;
 import static io.microsphere.util.ArrayUtils.isEmpty;
 import static org.springframework.web.bind.annotation.RequestMethod.values;
 
@@ -56,7 +57,7 @@ public class WebEndpointConfig {
     /**
      * @see WebEndpointMapping
      */
-    static class Mapping {
+    public static class Mapping {
 
         @NotNull
         @Valid
@@ -106,8 +107,11 @@ public class WebEndpointConfig {
             this.params = params;
         }
 
-        @Nullable
+        @Nonnull
         public String[] getHeaders() {
+            if (isEmpty(headers)) {
+                return EMPTY_STRING_ARRAY;
+            }
             return headers;
         }
 

@@ -20,17 +20,32 @@ import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapt
 import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
 import io.microsphere.spring.cloud.gateway.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
+import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig;
 import io.microsphere.spring.cloud.gateway.filter.WebEndpointMappingGlobalFilter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBindHandlerAdvisor;
+import org.springframework.boot.context.properties.bind.AbstractBindHandler;
+import org.springframework.boot.context.properties.bind.BindContext;
+import org.springframework.boot.context.properties.bind.BindHandler;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
+import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
+import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
+import java.util.Map;
+
+import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
+import static io.microsphere.spring.cloud.gateway.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
 
 /**
@@ -56,13 +71,47 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
                 "org.springframework.cloud.client.discovery.composite.reactive.ReactiveCompositeDiscoveryClientAutoConfiguration"
         }
 )
-public class WebEndpointMappingGatewayAutoConfiguration {
+public class WebEndpointMappingGatewayAutoConfiguration implements ConfigurationPropertiesBindHandlerAdvisor, EnvironmentAware {
+
+    /**
+     * The key of the {@link RouteDefinition#getMetadata() Routes' Metadata}
+     */
+    public static final String ROUTE_METADATA_KEY = "metadata";
+
+    /**
+     * The Web Endpoint key of the {@link RouteDefinition#getMetadata() Routes' Metadata}
+     */
+    public static final String ROUTE_METADATA_WEB_ENDPOINT_KEY = "web-endpoint";
+
+    private Environment environment;
 
     @Bean
     @ConditionalOnEnabledGlobalFilter
     @ConditionalOnBean(value = {ReactiveDiscoveryClientAdapter.class, LoadBalancerClientFactory.class}, search = CURRENT)
     public WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter(ReactiveDiscoveryClientAdapter reactiveDiscoveryClient,
-                                                                         LoadBalancerClientFactory loadBalancerClientFactory) {
-        return new WebEndpointMappingGlobalFilter(reactiveDiscoveryClient, loadBalancerClientFactory);
+                                                                         LoadBalancerClientFactory loadBalancerClientFactory,
+                                                                         GatewayProperties gatewayProperties) {
+        return new WebEndpointMappingGlobalFilter(reactiveDiscoveryClient, loadBalancerClientFactory, gatewayProperties);
+    }
+
+    @Override
+    public BindHandler apply(BindHandler bindHandler) {
+        return new AbstractBindHandler(bindHandler) {
+            @Override
+            public void onFinish(ConfigurationPropertyName name, Bindable<?> target, BindContext context, Object result) throws Exception {
+                String propertyName = name.toString();
+                if (propertyName.startsWith(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX) && propertyName.endsWith(ROUTE_METADATA_KEY)) {
+                    ConfigurationPropertyName webEndpointName = name.append(ROUTE_METADATA_WEB_ENDPOINT_KEY);
+                    WebEndpointConfig webEndpointConfig = getWebEndpointConfig(environment, webEndpointName.toString());
+                    Map<String, Object> metadata = (Map<String, Object>) result;
+                    metadata.put(ROUTE_METADATA_WEB_ENDPOINT_KEY, webEndpointConfig);
+                }
+            }
+        };
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 }
