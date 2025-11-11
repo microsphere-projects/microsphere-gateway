@@ -14,9 +14,8 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>Microsphere :: Gateway</name>
-    <description>Microsphere Projects for Gateway</description>
-    <url>https://github.com/microsphere-projects/microsphere-gateway</url>
+    <name>Microsphere :: Gateway :: Spring Cloud Gateway Server WebFlux</name>
+    <description>Microsphere Spring Cloud Gateway Server WebFlux</description>
 
     <organization>
         <name>Microsphere</name>
@@ -59,8 +58,9 @@
     <modules>
         <module>microsphere-gateway-parent</module>
         <module>microsphere-gateway-dependencies</module>
-        <module>microsphere-spring-cloud-gateway</module>
-        <module>microsphere-spring-cloud-gateway-mvc</module>
+        <module>microsphere-spring-cloud-gateway-commons</module>
+        <module>microsphere-spring-cloud-gateway-server-webflux</module>
+        <module>microsphere-spring-cloud-gateway-server-webmvc</module>
     </modules>
 
 </project>
