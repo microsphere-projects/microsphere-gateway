@@ -17,6 +17,7 @@
 package io.microsphere.spring.cloud.gateway.server.webflux.filter;
 
 import io.microsphere.logging.Logger;
+import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig;
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig.Mapping;
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
@@ -39,9 +40,11 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
 import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -68,6 +71,7 @@ import static io.microsphere.spring.cloud.client.service.registry.constants.Inst
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getUriString;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
 import static io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure.WebEndpointMappingGatewayAutoConfiguration.ROUTE_METADATA_WEB_ENDPOINT_KEY;
+import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static io.microsphere.spring.cloud.gateway.server.webflux.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.spring.web.util.MonoUtils.getValue;
@@ -93,7 +97,7 @@ import static org.springframework.web.reactive.result.method.RequestMappingInfo.
  * @since 1.0.0
  */
 public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplicationListener, ApplicationContextAware,
-        DisposableBean, Ordered {
+        EnvironmentAware, DisposableBean, Ordered {
 
     private static final Logger logger = getLogger(WebEndpointMappingGlobalFilter.class);
 
@@ -121,6 +125,8 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
     private final GatewayProperties gatewayProperties;
 
     private ApplicationContext context;
+
+    private Environment environment;
 
     volatile Map<String, Collection<RequestMappingContext>> routedRequestMappingContextsCache = null;
 
@@ -169,11 +175,16 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         return chain.filter(exchange);
     }
 
+    public boolean supportsAsyncExecution() {
+        return false;
+    }
+
     @Override
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
         return ContextRefreshedEvent.class.equals(eventType)
                 || RefreshRoutesResultEvent.class.equals(eventType)
-                || EnvironmentChangeEvent.class.equals(eventType);
+                || EnvironmentChangeEvent.class.equals(eventType)
+                || ServiceInstancesChangedEvent.class.equals(eventType);
     }
 
     @Override
@@ -184,12 +195,19 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
             onRefreshRoutesResultEvent(refreshRoutesResultEvent);
         } else if (event instanceof EnvironmentChangeEvent environmentChangeEvent) {
             onEnvironmentChangeEvent(environmentChangeEvent);
+        } else {
+            onServiceInstancesChangedEvent();
         }
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
     @Override
@@ -216,6 +234,12 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
     }
 
     private void onEnvironmentChangeEvent(EnvironmentChangeEvent event) {
+        if (matchesEvent(event)) {
+            refresh();
+        }
+    }
+
+    private void onServiceInstancesChangedEvent() {
         refresh();
     }
 
@@ -354,6 +378,25 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
 
     private boolean matchesEvent(RefreshRoutesResultEvent event) {
         return isSuccessRouteLocatorEvent(event);
+    }
+
+    private boolean matchesEvent(EnvironmentChangeEvent event) {
+        Set<String> keys = event.getKeys();
+        for (String key : keys) {
+            if (key.startsWith(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX)) {
+                int lastIndex = key.lastIndexOf(".id");
+                if (lastIndex > -1) {
+                    List<RouteDefinition> routes = this.gatewayProperties.getRoutes();
+                    String propertyValue = this.environment.getProperty(key);
+                    for (RouteDefinition route : routes) {
+                        if (route.getId().equals(propertyValue)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     Collection<String> getSubscribedServices(URI routeUri) {

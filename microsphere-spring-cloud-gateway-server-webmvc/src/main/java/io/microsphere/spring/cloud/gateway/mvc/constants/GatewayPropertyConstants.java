@@ -42,5 +42,5 @@ public interface GatewayPropertyConstants {
      *
      * @see GatewayMvcProperties#PREFIX
      */
-    String GATEWAY_ROUTES_PROPERTY_PREFIX = PREFIX + DOT + "routes";
+    String GATEWAY_ROUTES_PROPERTY_NAME_PREFIX = PREFIX + DOT + "routes";
 }

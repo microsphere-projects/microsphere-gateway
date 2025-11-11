@@ -18,6 +18,7 @@
 package io.microsphere.spring.cloud.gateway.server.webflux.filter;
 
 
+import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
 import io.microsphere.spring.test.web.controller.TestController;
@@ -34,8 +35,10 @@ import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.discovery.simple.reactive.SimpleReactiveDiscoveryProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
+import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -45,12 +48,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.microsphere.collection.CollectionUtils.first;
+import static io.microsphere.collection.Lists.ofList;
+import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.spring.core.env.PropertySourcesUtils.getSubProperties;
 import static java.net.URI.create;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext;
@@ -127,11 +137,7 @@ class WebEndpointMappingGlobalFilterTest {
     @Test
     @Order(1)
     void testFilter() {
-        this.webTestClient.get().uri("/test-app/test/helloworld")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .isEqualTo(testController.helloWorld());
+        testHelloWorldEndpoint();
 
         this.webTestClient.get().uri("/test-1/test/helloworld")
                 .exchange()
@@ -151,11 +157,28 @@ class WebEndpointMappingGlobalFilterTest {
         Collection<String> subscribedServices = this.filter.getSubscribedServices(uri);
         assertEquals(1, subscribedServices.size());
         assertEquals("test-app", first(subscribedServices));
+
+        // To publish a ServiceInstancesChangedEvent
+        this.context.publishEvent(new ServiceInstancesChangedEvent(this.registration.getServiceId(), ofList(this.registration)));
+        testHelloWorldEndpoint();
+
+        // To publish a EnvironmentChangeEvent
+        this.context.publishEvent(new EnvironmentChangeEvent(emptySet()));
+
+        ConfigurableEnvironment environment = this.context.getEnvironment();
+        Map<String, Object> subProperties = getSubProperties(environment, PREFIX);
+        Set<String> keys = subProperties.keySet().stream()
+                .map(key -> PREFIX + DOT + key)
+                .collect(toSet());
+
+        // To publish a EnvironmentChangeEvent
+        this.context.publishEvent(new EnvironmentChangeEvent(keys));
+        testHelloWorldEndpoint();
     }
 
     @Test
     @Order(2)
-    void testFilterForUnregisteredApplication() {
+    void testFilterOnUnregisteredApplication() {
         this.webTestClient.get().uri("/test-0/test/helloworld")
                 .exchange()
                 .expectStatus().isOk();
@@ -165,7 +188,7 @@ class WebEndpointMappingGlobalFilterTest {
 
     @Test
     @Order(3)
-    void testFilterWithoutRoutedRequestMappingContexts() {
+    void testFilterOnNoRoutedRequestMappingContext() {
         this.filter.clear();
         this.filter.destroy();
         this.webTestClient.get().uri("/test-app/test/helloworld")
@@ -175,7 +198,7 @@ class WebEndpointMappingGlobalFilterTest {
 
     @Test
     @Order(4)
-    void testFilterForNoGateway() {
+    void testFilterOnNoRouting() {
         this.webTestClient.get().uri("/test/helloworld")
                 .exchange()
                 .expectStatus().isOk()
@@ -183,21 +206,11 @@ class WebEndpointMappingGlobalFilterTest {
                 .isEqualTo(testController.helloWorld());
     }
 
-    @Test
-    @Order(5)
-    void testFilterForExcludedRequests() {
-        this.webTestClient.get().uri("/test-1/test/helloworld")
+    void testHelloWorldEndpoint() {
+        this.webTestClient.get().uri("/test-app/test/helloworld")
                 .exchange()
-                .expectStatus().isOk();
-
-        this.webTestClient.get().uri("/test-2/test/helloworld")
-                .exchange()
-                .expectStatus().isOk();
-
-        this.webTestClient.get().uri("/test-3/abc/def")
-                .header(CONTENT_TYPE, "application/json")
-                .header(ACCEPT, "plain/text")
-                .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo(testController.helloWorld());
     }
 }

@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_PREFIX;
+import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction.SCHEME;
 import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
 import static io.microsphere.util.StringUtils.startsWith;
@@ -155,7 +155,7 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
             List<RouteProperties> routes = getWebEndpointMappingRouteProperties();
             List<RouteProperties> foundRoutes = new LinkedList<>();
             for (String key : keys) {
-                if (startsWith(key, GATEWAY_ROUTES_PROPERTY_PREFIX)) {
+                if (startsWith(key, GATEWAY_ROUTES_PROPERTY_NAME_PREFIX)) {
                     int lastIndex = key.lastIndexOf(".id");
                     if (lastIndex > -1) {
                         String propertyValue = this.environment.getProperty(key);

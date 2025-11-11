@@ -46,7 +46,7 @@ import java.util.List;
 
 import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.collection.Sets.ofSet;
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_PREFIX;
+import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -148,7 +148,7 @@ class WebEndpointMappingHandlerFilterFunctionTest {
                 .andExpect(content().string(this.testController.helloWorld()));
 
 
-        EnvironmentChangeEvent event = new EnvironmentChangeEvent(ofSet(GATEWAY_ROUTES_PROPERTY_PREFIX + "[0].id"));
+        EnvironmentChangeEvent event = new EnvironmentChangeEvent(ofSet(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].id"));
         webApplicationContext.publishEvent(event);
         this.mockMvc.perform(get("/we/test-app/test/helloworld"))
                 .andExpect(status().isOk())
