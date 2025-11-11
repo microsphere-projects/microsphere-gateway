@@ -10,3 +10,32 @@ metadata:
       - patterns: /test-3/abc/**
         consumes: application/json
         produces: plain/text
+
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: web-endpoint-mapping
+          uri: we://all
+          predicates:
+            - Path=/{application}/**
+          metadata:
+            web-endpoint:
+              excludes:
+                - patterns: /test-1/**
+                  methods: GET
+                  params: p=1
+                - patterns: /test-2/**
+                  methods: POST
+                  headers: h=1
+        - id: web-endpoint-mapping
+          uri: we://test
+          predicates:
+            - Path=/{application}/**
+          metadata:
+            web-endpoint:
+              excludes:
+                - patterns: /test-3/abc/**
+                  consumes: application/json
+                  produces: plain/text

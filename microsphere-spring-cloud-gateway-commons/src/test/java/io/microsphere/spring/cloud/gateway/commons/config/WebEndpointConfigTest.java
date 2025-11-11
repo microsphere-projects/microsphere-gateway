@@ -21,28 +21,24 @@ package io.microsphere.spring.cloud.gateway.commons.config;
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig.Mapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.context.properties.bind.BindHandler;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.context.properties.bind.validation.ValidationBindHandler;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.env.YamlPropertySourceLoader;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.util.List;
 
+import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
 import static io.microsphere.util.ArrayUtils.ofArray;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.boot.context.properties.bind.Bindable.of;
-import static org.springframework.boot.context.properties.source.ConfigurationPropertySources.from;
+import static org.springframework.boot.context.properties.source.ConfigurationPropertySources.attach;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -55,10 +51,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 class WebEndpointConfigTest {
 
-
-    private Iterable<ConfigurationPropertySource> configurationPropertySources;
-
-    private BindHandler bindHandler;
+    private Environment environment;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -66,18 +59,20 @@ class WebEndpointConfigTest {
         Resource resource = resourceLoader.getResource("classpath:META-INF/config/default/test.yaml");
         YamlPropertySourceLoader propertySourceLoader = new YamlPropertySourceLoader();
         List<PropertySource<?>> propertySources = propertySourceLoader.load(resource.toString(), resource);
-        this.configurationPropertySources = from(propertySources);
 
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        this.bindHandler = new ValidationBindHandler(validator);
+        MockEnvironment environment = new MockEnvironment();
+        for (PropertySource<?> propertySource : propertySources) {
+            environment.getPropertySources().addFirst(propertySource);
+        }
+
+        attach(environment);
+
+        this.environment = environment;
     }
 
     @Test
     void test() {
-        Binder binder = new Binder(this.configurationPropertySources);
-        Bindable<WebEndpointConfig> bindable = of(WebEndpointConfig.class);
-        WebEndpointConfig config = binder.bind("metadata.web-endpoint", bindable, bindHandler).get();
+        WebEndpointConfig config = getWebEndpointConfig(this.environment, "metadata.web-endpoint");
         assertNotNull(config);
         List<Mapping> excludes = config.getExcludes();
         assertEquals(3, excludes.size());
@@ -105,5 +100,14 @@ class WebEndpointConfigTest {
         assertNull(exclude.getHeaders());
         assertArrayEquals(ofArray("application/json"), exclude.getConsumes());
         assertArrayEquals(ofArray("plain/text"), exclude.getProduces());
+
+        config = getWebEndpointConfig(this.environment, "spring.cloud.gateway.routes[0].metadata.web-endpoint");
+        assertNotNull(config);
+
+        config = getWebEndpointConfig(this.environment, "spring.cloud.gateway.routes[1].metadata.web-endpoint");
+        assertNotNull(config);
+
+        config = getWebEndpointConfig(this.environment, "spring.cloud.gateway.routes[1]");
+        assertNull(config);
     }
 }
