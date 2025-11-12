@@ -71,7 +71,10 @@ import static io.microsphere.net.URLUtils.buildURI;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getUriString;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
+import static io.microsphere.spring.cloud.gateway.commons.constants.CommonConstants.APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ALL_SERVICES;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
 import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static io.microsphere.spring.cloud.gateway.server.webflux.util.GatewayUtils.isSuccessRouteLocatorEvent;
@@ -103,21 +106,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         EnvironmentAware, DisposableBean, Ordered {
 
     private static final Logger logger = getLogger(WebEndpointMappingGlobalFilter.class);
-
-    /**
-     * The Web Endpoint scheme of the {@link Route#getUri() Routes' URI}
-     */
-    public static final String SCHEME = "we";
-
-    /**
-     * The all services for mapping
-     */
-    public static final String ALL_SERVICES = "all";
-
-    /**
-     * The URI template variable name for application name
-     */
-    public static final String APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME = "application";
 
     static final String NEW_PATH_ATTRIBUTE_NAME = "msg-new-path";
 
