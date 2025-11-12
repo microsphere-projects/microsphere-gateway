@@ -18,9 +18,9 @@ package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 
 import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapter;
 import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
-import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig;
+import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -35,7 +35,6 @@ import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +44,8 @@ import org.springframework.core.env.Environment;
 import java.util.Map;
 
 import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.METADATA_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
 import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
 
@@ -73,16 +74,6 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
 )
 public class WebEndpointMappingGatewayAutoConfiguration implements ConfigurationPropertiesBindHandlerAdvisor, EnvironmentAware {
 
-    /**
-     * The key of the {@link RouteDefinition#getMetadata() Routes' Metadata}
-     */
-    public static final String ROUTE_METADATA_KEY = "metadata";
-
-    /**
-     * The Web Endpoint key of the {@link RouteDefinition#getMetadata() Routes' Metadata}
-     */
-    public static final String ROUTE_METADATA_WEB_ENDPOINT_KEY = "web-endpoint";
-
     private Environment environment;
 
     @Bean
@@ -100,11 +91,13 @@ public class WebEndpointMappingGatewayAutoConfiguration implements Configuration
             @Override
             public void onFinish(ConfigurationPropertyName name, Bindable<?> target, BindContext context, Object result) throws Exception {
                 String propertyName = name.toString();
-                if (propertyName.startsWith(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX) && propertyName.endsWith(ROUTE_METADATA_KEY)) {
-                    ConfigurationPropertyName webEndpointName = name.append(ROUTE_METADATA_WEB_ENDPOINT_KEY);
+                if (propertyName.startsWith(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX) && propertyName.endsWith(METADATA_KEY) && result != null) {
+                    ConfigurationPropertyName webEndpointName = name.append(WEB_ENDPOINT_KEY);
                     WebEndpointConfig webEndpointConfig = getWebEndpointConfig(environment, webEndpointName.toString());
-                    Map<String, Object> metadata = (Map<String, Object>) result;
-                    metadata.put(ROUTE_METADATA_WEB_ENDPOINT_KEY, webEndpointConfig);
+                    if (webEndpointConfig != null) {
+                        Map<String, Object> metadata = (Map<String, Object>) result;
+                        metadata.put(WEB_ENDPOINT_KEY, webEndpointConfig);
+                    }
                 }
             }
         };
