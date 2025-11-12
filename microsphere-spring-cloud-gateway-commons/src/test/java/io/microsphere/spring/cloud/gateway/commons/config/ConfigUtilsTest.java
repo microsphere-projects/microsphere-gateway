@@ -59,6 +59,10 @@ class ConfigUtilsTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        this.environment = createEnvironment();
+    }
+
+    public static Environment createEnvironment() throws IOException {
         DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource = resourceLoader.getResource("classpath:META-INF/config/default/test.yaml");
         YamlPropertySourceLoader propertySourceLoader = new YamlPropertySourceLoader();
@@ -70,8 +74,7 @@ class ConfigUtilsTest {
         }
 
         attach(environment);
-
-        this.environment = environment;
+        return environment;
     }
 
     @Test
