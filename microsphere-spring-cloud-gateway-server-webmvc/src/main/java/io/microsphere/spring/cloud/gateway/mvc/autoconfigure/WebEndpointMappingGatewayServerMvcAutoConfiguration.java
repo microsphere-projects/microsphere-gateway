@@ -109,7 +109,7 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
                 onContextRefreshedEvent(contextRefreshedEvent);
             } else if (event instanceof EnvironmentChangeEvent environmentChangeEvent) {
                 onEnvironmentChangeEvent(environmentChangeEvent);
-            } else if (event instanceof ServiceInstancesChangedEvent) {
+            } else {
                 onServiceInstancesChangedEvent();
             }
         }
