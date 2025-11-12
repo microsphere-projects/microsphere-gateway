@@ -1,0 +1,50 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.microsphere.spring.cloud.gateway.commons.annotation;
+
+import io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.DEFAULT_MICROSPHERE_GATEWAY_ENABLED;
+import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.MICROSPHERE_GATEWAY_ENABLED_PROPERTY_NAME;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+/**
+ * The conditional annotation meta-annotates {@link ConditionalOnProperty @ConditionalOnProperty} for
+ * Microsphere Spring Cloud Gateway enabled.
+ *
+ * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see Conditional
+ * @see ConditionalOnProperty
+ * @see CommonsPropertyConstants#MICROSPHERE_GATEWAY_ENABLED_PROPERTY_NAME
+ * @since 1.0.0
+ */
+@Retention(RUNTIME)
+@Target({TYPE, METHOD})
+@Documented
+@ConditionalOnProperty(name = MICROSPHERE_GATEWAY_ENABLED_PROPERTY_NAME,
+        havingValue = DEFAULT_MICROSPHERE_GATEWAY_ENABLED, matchIfMissing = true)
+public @interface ConditionalOnMicrosphereGatewayEnabled {
+}
