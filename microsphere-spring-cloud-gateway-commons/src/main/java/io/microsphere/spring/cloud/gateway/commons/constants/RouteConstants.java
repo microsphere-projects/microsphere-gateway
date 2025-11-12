@@ -51,4 +51,9 @@ public interface RouteConstants {
      * The key of Web Endpoint under the Routes' Metadata
      */
     String WEB_ENDPOINT_KEY = "web-endpoint";
+
+    /**
+     * The attribute name of Web Endpoint rewrite path
+     */
+    String WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME = "msgw-we-rewrite-path";
 }
