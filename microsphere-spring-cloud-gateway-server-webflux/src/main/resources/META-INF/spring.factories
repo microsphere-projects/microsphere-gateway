@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure.GatewayAutoConfiguration,\
+io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure.WebEndpointMappingGatewayAutoConfiguration
+
+org.springframework.context.ApplicationContextInitializer=\
+io.microsphere.spring.cloud.gateway.server.webflux.context.WebEndpointApplicationContextInitializer
