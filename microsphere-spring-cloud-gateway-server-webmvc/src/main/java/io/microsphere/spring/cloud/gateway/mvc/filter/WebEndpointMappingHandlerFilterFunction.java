@@ -125,7 +125,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
                 .header(ID_HEADER_NAME, valueOf(id))
                 .build();
 
-        request.attributes().put(GATEWAY_REQUEST_URL_ATTR, newRequest.uri());
+        attributes.put(GATEWAY_REQUEST_URL_ATTR, newRequest.uri());
 
         return lbHandlerFunctionDefinition.filter(newRequest, next);
     }
@@ -172,7 +172,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         return requestMappingContexts;
     }
 
-    private Set<RequestMappingInfo> buildExcludedRequestMappingInfoSet(RouteProperties routeProperties) {
+    Set<RequestMappingInfo> buildExcludedRequestMappingInfoSet(RouteProperties routeProperties) {
         WebEndpointConfig webEndpointConfig = getWebEndpointConfig(routeProperties.getMetadata());
         if (webEndpointConfig == null) {
             return emptySet();
@@ -245,7 +245,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         return matches(requestMappingInfo, servletRequest);
     }
 
-    private boolean isExcludedRequest(HttpServletRequest request) {
+    boolean isExcludedRequest(HttpServletRequest request) {
         Collection<RequestMappingInfo> excludedRequestMappingInfoSet = this.excludedRequestMappingInfoSet;
         if (excludedRequestMappingInfoSet != null) {
             for (RequestMappingInfo excludedRequestMappingInfo : excludedRequestMappingInfoSet) {
@@ -272,7 +272,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
             this.id = webEndpointMapping.getId();
         }
 
-        public int compareTo(RequestMappingContext other, HttpServletRequest request) {
+        int compareTo(RequestMappingContext other, HttpServletRequest request) {
             return this.requestMappingInfo.compareTo(other.requestMappingInfo, request);
         }
     }
