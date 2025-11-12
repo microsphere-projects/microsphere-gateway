@@ -14,9 +14,8 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>Microsphere :: Gateway</name>
-    <description>Microsphere Projects for Gateway</description>
-    <url>https://github.com/microsphere-projects/microsphere-gateway</url>
+    <name>Microsphere :: Gateway :: Spring Cloud Gateway Server WebFlux</name>
+    <description>Microsphere Spring Cloud Gateway Server WebFlux</description>
 
     <organization>
         <name>Microsphere</name>
@@ -52,38 +51,16 @@
     </scm>
 
     <properties>
-        <revision>0.2.0-SNAPSHOT</revision>
+        <revision>0.2.1-SNAPSHOT</revision>
+        <java.version>17</java.version>
     </properties>
 
     <modules>
         <module>microsphere-gateway-parent</module>
         <module>microsphere-gateway-dependencies</module>
-        <module>microsphere-spring-cloud-gateway</module>
-        <module>microsphere-spring-cloud-gateway-mvc</module>
+        <module>microsphere-spring-cloud-gateway-commons</module>
+        <module>microsphere-spring-cloud-gateway-server-webflux</module>
+        <module>microsphere-spring-cloud-gateway-server-webmvc</module>
     </modules>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>snapshot</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 
 </project>

@@ -1,0 +1,87 @@
+spring:
+  application:
+    name: test-app
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: simple-service-registry
+
+microsphere:
+  spring:
+    cloud:
+      service-registry:
+        auto-registration:
+          simple:
+            enabled: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: gateway
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: add_response_header_route_all
+            uri: https://example.org
+            predicates:
+              - Path=/*
+            filters:
+              - AddResponseHeader=test-header-name, test-header-value
+            metadata:
+              a: 1
+          - id: add_response_header_route
+            uri: https://example.org
+            predicates:
+              - Path=/we/*
+            filters:
+              - AddResponseHeader=test-header-name, test-header-value
+          - id: web-endpoint-mapping
+            uri: we://all
+            predicates:
+              - Path=/we/{application}/**
+            metadata:
+              web-endpoint:
+                excludes:
+                  - patterns: /we/test-app/**
+                    consumes: application/json
+                    produces: plain/text
+
+      server:
+        webmvc:
+          routes:
+            - id: add_response_header_route_all
+              uri: https://example.org
+              predicates:
+                - Path=/*
+              filters:
+                - AddResponseHeader=test-header-name, test-header-value
+              metadata:
+                a: 1
+            - id: add_response_header_route
+              uri: https://example.org
+              predicates:
+                - Path=/we/*
+              filters:
+                - AddResponseHeader=test-header-name, test-header-value
+            - id: web-endpoint-mapping
+              uri: we://all
+              predicates:
+                - Path=/we/{application}/**
+              metadata:
+                web-endpoint:
+                  excludes:
+                    - patterns: /we/test-app/**
+                      consumes: application/json
+                      produces: plain/text

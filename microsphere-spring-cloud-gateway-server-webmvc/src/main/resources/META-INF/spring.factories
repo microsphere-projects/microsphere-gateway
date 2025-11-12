@@ -1,0 +1,6 @@
+org.springframework.cloud.gateway.server.mvc.handler.HandlerSupplier=\
+io.microsphere.spring.cloud.gateway.server.webmvc.filter.WebEndpointMappingHandlerSupplier
+
+
+org.springframework.context.ApplicationContextInitializer=\
+io.microsphere.spring.cloud.gateway.server.webmvc.context.WebEndpointApplicationContextInitializer
