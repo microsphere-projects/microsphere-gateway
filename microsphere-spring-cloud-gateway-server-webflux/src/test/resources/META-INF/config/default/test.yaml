@@ -115,6 +115,34 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: request_size_route
+          uri: http://localhost:8080/upload
+          predicates:
+            - Path=/upload
+          filters:
+            - name: RequestSize
+              args:
+                maxSize: 5000000
+          metadata:
+            a: 1
+        - id: retry_test
+          uri: http://localhost:8080/flakey
+          predicates:
+            - Host=*.retry.com
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 50ms
+                  factor: 2
+                  basedOnPreviousValue: false
+                jitter:
+                  randomFactor: 0.5
+                timeout: 100ms
         - id: web-endpoint-mapping
           uri: we://all
           predicates:
@@ -128,9 +156,38 @@ spring:
                 - patterns: /test-3/abc/**
                   consumes: application/json
                   produces: plain/text
+
       server:
         webflux:
           routes:
+            - id: request_size_route
+              uri: http://localhost:8080/upload
+              predicates:
+                - Path=/upload
+              filters:
+                - name: RequestSize
+                  args:
+                    maxSize: 5000000
+              metadata:
+                a: 1
+            - id: retry_test
+              uri: http://localhost:8080/flakey
+              predicates:
+                - Host=*.retry.com
+              filters:
+                - name: Retry
+                  args:
+                    retries: 3
+                    statuses: BAD_GATEWAY
+                    methods: GET,POST
+                    backoff:
+                      firstBackoff: 10ms
+                      maxBackoff: 50ms
+                      factor: 2
+                      basedOnPreviousValue: false
+                    jitter:
+                      randomFactor: 0.5
+                    timeout: 100ms
             - id: web-endpoint-mapping
               uri: we://all
               predicates:
