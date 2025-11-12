@@ -166,7 +166,6 @@ class WebEndpointMappingHandlerFilterFunctionTest {
                         .header(ACCEPT, "plain/text")
         ));
 
-
         EnvironmentChangeEvent event = new EnvironmentChangeEvent(ofSet(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].id"));
         webApplicationContext.publishEvent(event);
         this.mockMvc.perform(get("/we/test-app/test/helloworld"))
@@ -189,6 +188,10 @@ class WebEndpointMappingHandlerFilterFunctionTest {
 
         URI uri = URI.create("we://test-app");
         assertEquals(ofSet("test-app"), function.getSubscribedServices(uri));
+
+        RouteProperties routeProperties = new RouteProperties();
+        routeProperties.setId(routeId + "[0]");
+        function.refresh(routeProperties, this.webApplicationContext);
 
         HttpServletRequest request = new MockHttpServletRequest();
         function.excludedRequestMappingInfoSet = null;
