@@ -22,10 +22,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
- * TODO
- *
+ * Test Application
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see TODO
  * @since 1.0.0
  */
 @EnableAutoConfiguration
