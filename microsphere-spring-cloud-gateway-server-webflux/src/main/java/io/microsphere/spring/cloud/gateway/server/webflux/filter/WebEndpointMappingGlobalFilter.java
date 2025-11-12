@@ -53,6 +53,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -70,7 +71,8 @@ import static io.microsphere.net.URLUtils.buildURI;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getUriString;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
-import static io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure.WebEndpointMappingGatewayAutoConfiguration.ROUTE_METADATA_WEB_ENDPOINT_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
 import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static io.microsphere.spring.cloud.gateway.server.webflux.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
@@ -79,6 +81,7 @@ import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.substringAfter;
 import static java.lang.String.valueOf;
 import static java.net.URI.create;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Stream.of;
 import static org.springframework.cloud.gateway.filter.ReactiveLoadBalancerClientFilter.LOAD_BALANCER_CLIENT_FILTER_ORDER;
@@ -189,6 +192,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
+        logger.trace("Listened on the event : {}", event);
         if (event instanceof ContextRefreshedEvent contextRefreshedEvent) {
             onContextRefreshedEvent(contextRefreshedEvent);
         } else if (event instanceof RefreshRoutesResultEvent refreshRoutesResultEvent) {
@@ -246,18 +250,16 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
     private void refresh() {
         Map<String, Collection<RequestMappingContext>> routedRequestMappingContextsCache = new ConcurrentHashMap<>();
         Map<String, Collection<RequestMappingInfo>> routedExcludedRequestMappingInfoCache = new ConcurrentHashMap<>();
-        List<RouteDefinition> routes = this.gatewayProperties.getRoutes();
+        List<RouteDefinition> webEndpointRoutes = getWebEndpointRoutes();
 
-        for (RouteDefinition route : routes) {
-            URI routeUri = route.getUri();
-            if (isWebEndpointRoute(routeUri)) {
-                String routeId = route.getId();
-                Collection<RequestMappingContext> requestMappingContexts = buildRequestMappingContexts(routeUri);
-                routedRequestMappingContextsCache.put(routeId, requestMappingContexts);
+        for (RouteDefinition webEndpointRoute : webEndpointRoutes) {
+            String routeId = webEndpointRoute.getId();
+            URI routeUri = webEndpointRoute.getUri();
+            Collection<RequestMappingContext> requestMappingContexts = buildRequestMappingContexts(routeUri);
+            routedRequestMappingContextsCache.put(routeId, requestMappingContexts);
 
-                Set<RequestMappingInfo> requestMappingInfoSet = buildExcludedRequestMappingInfoSet(routes, routeId);
-                routedExcludedRequestMappingInfoCache.put(routeId, requestMappingInfoSet);
-            }
+            Set<RequestMappingInfo> requestMappingInfoSet = buildExcludedRequestMappingInfoSet(webEndpointRoutes, routeId);
+            routedExcludedRequestMappingInfoCache.put(routeId, requestMappingInfoSet);
         }
 
         // exchange
@@ -296,7 +298,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
     private WebEndpointConfig findWebEndpointConfig(List<RouteDefinition> routes, String routeId) {
         RouteDefinition routeDefinition = filterFirst(routes, def -> routeId.equals(def.getId()));
         Map<String, Object> metadata = routeDefinition.getMetadata();
-        return (WebEndpointConfig) metadata.get(ROUTE_METADATA_WEB_ENDPOINT_KEY);
+        return (WebEndpointConfig) metadata.get(WEB_ENDPOINT_KEY);
     }
 
     private ServiceInstance choose(String applicationName) {
@@ -382,11 +384,11 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
 
     private boolean matchesEvent(EnvironmentChangeEvent event) {
         Set<String> keys = event.getKeys();
+        List<RouteDefinition> routes = isEmpty(keys) ? emptyList() : getWebEndpointRoutes();
         for (String key : keys) {
             if (key.startsWith(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX)) {
-                int lastIndex = key.lastIndexOf(".id");
-                if (lastIndex > -1) {
-                    List<RouteDefinition> routes = this.gatewayProperties.getRoutes();
+                int lastIndex = key.lastIndexOf(ID_KEY);
+                if (lastIndex == (key.length() - ID_KEY.length())) {
                     String propertyValue = this.environment.getProperty(key);
                     for (RouteDefinition route : routes) {
                         if (route.getId().equals(propertyValue)) {
@@ -398,6 +400,19 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         }
         return false;
     }
+
+    private List<RouteDefinition> getWebEndpointRoutes() {
+        List<RouteDefinition> routes = this.gatewayProperties.getRoutes();
+        List<RouteDefinition> webEndpointRoutes = new ArrayList<>(routes.size());
+        for (RouteDefinition route : routes) {
+            URI routeUri = route.getUri();
+            if (isWebEndpointRoute(routeUri)) {
+                webEndpointRoutes.add(route);
+            }
+        }
+        return webEndpointRoutes;
+    }
+
 
     Collection<String> getSubscribedServices(URI routeUri) {
         String host = routeUri.getHost();
