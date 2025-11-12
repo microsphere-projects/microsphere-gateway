@@ -20,6 +20,13 @@ package io.microsphere.spring.cloud.gateway.server.webmvc.constants;
 
 import org.junit.jupiter.api.Test;
 
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
+import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ENABLED_PROPERTY_NAME;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties.PREFIX;
+
 /**
  * {@link GatewayPropertyConstants} Test
  *
@@ -31,5 +38,7 @@ class GatewayPropertyConstantsTest {
 
     @Test
     void testConstants() {
+        assertEquals(PREFIX + DOT + ENABLED_PROPERTY_NAME, GATEWAY_ENABLED_PROPERTY_NAME);
+        assertEquals(PREFIX + DOT + "routes", GATEWAY_ROUTES_PROPERTY_NAME_PREFIX);
     }
 }
