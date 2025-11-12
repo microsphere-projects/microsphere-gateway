@@ -20,8 +20,10 @@ package io.microsphere.spring.cloud.gateway.commons.constants;
 
 import org.junit.jupiter.api.Test;
 
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ALL_SERVICES;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.METADATA_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,6 +38,8 @@ class RouteConstantsTest {
 
     @Test
     void testConstants() {
+        assertEquals("we", SCHEME);
+        assertEquals("all", ALL_SERVICES);
         assertEquals("id", ID_KEY);
         assertEquals("metadata", METADATA_KEY);
         assertEquals("web-endpoint", WEB_ENDPOINT_KEY);
