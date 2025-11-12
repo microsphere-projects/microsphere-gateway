@@ -71,11 +71,11 @@ import static io.microsphere.net.URLUtils.buildURI;
 import static io.microsphere.spring.cloud.client.service.registry.constants.InstanceConstants.WEB_CONTEXT_PATH_METADATA_NAME;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getUriString;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
+import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
 import static io.microsphere.spring.cloud.gateway.commons.constants.CommonConstants.APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ALL_SERVICES;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
-import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
 import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static io.microsphere.spring.cloud.gateway.server.webflux.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
@@ -286,7 +286,7 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
     private WebEndpointConfig findWebEndpointConfig(List<RouteDefinition> routes, String routeId) {
         RouteDefinition routeDefinition = filterFirst(routes, def -> routeId.equals(def.getId()));
         Map<String, Object> metadata = routeDefinition.getMetadata();
-        return (WebEndpointConfig) metadata.get(WEB_ENDPOINT_KEY);
+        return getWebEndpointConfig(metadata);
     }
 
     private ServiceInstance choose(String applicationName) {
