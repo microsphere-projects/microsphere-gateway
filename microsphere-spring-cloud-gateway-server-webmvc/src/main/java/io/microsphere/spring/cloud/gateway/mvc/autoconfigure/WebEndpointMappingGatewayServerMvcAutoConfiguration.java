@@ -18,6 +18,7 @@ package io.microsphere.spring.cloud.gateway.mvc.autoconfigure;
 
 import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
+import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindHandlerAdvisor;
 import io.microsphere.spring.cloud.gateway.mvc.annotation.ConditionalOnGatewayServerMvcEnabled;
 import io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -35,6 +36,7 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -48,8 +50,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
 import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
-import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction.SCHEME;
 import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
 import static io.microsphere.util.StringUtils.startsWith;
 import static java.util.stream.Collectors.toUnmodifiableList;
@@ -80,6 +82,11 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 )
 @Import(WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig.class)
 public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
+
+    @Bean
+    public static WebEndpointConfigurationPropertiesBindHandlerAdvisor webEndpointConfigurationPropertiesBindHandlerAdvisor() {
+        return new WebEndpointConfigurationPropertiesBindHandlerAdvisor(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX);
+    }
 
     @ConditionalOnBean(value = {GatewayMvcProperties.class, DiscoveryClient.class, LoadBalancerClientFactory.class})
     static class WebEndpointMappingHandlerConfig implements SmartApplicationListener {

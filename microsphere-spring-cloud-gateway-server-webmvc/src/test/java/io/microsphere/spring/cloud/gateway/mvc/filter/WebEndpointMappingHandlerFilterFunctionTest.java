@@ -50,6 +50,8 @@ import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyC
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -146,6 +148,12 @@ class WebEndpointMappingHandlerFilterFunctionTest {
         this.mockMvc.perform(get("/we/test-app/test/helloworld"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(this.testController.helloWorld()));
+
+        assertThrows(Exception.class, () -> this.mockMvc.perform(
+                get("/we/test-app/test/helloworld")
+                        .header(CONTENT_TYPE, "application/json")
+                        .header(ACCEPT, "plain/text")
+        ));
 
 
         EnvironmentChangeEvent event = new EnvironmentChangeEvent(ofSet(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].id"));

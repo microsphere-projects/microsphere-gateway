@@ -19,15 +19,14 @@ package io.microsphere.spring.cloud.gateway.mvc.filter;
 
 import io.microsphere.annotation.Nonnull;
 import io.microsphere.logging.Logger;
-import io.microsphere.spring.boot.context.config.BindableConfigurationBeanBinder;
-import io.microsphere.spring.context.config.ConfigurationBeanBinder;
+import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig;
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.server.RequestPath;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.HandlerFunction;
@@ -37,7 +36,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,28 +46,29 @@ import java.util.function.Function;
 
 import static io.microsphere.collection.ListUtils.first;
 import static io.microsphere.collection.ListUtils.newArrayList;
-import static io.microsphere.collection.PropertiesUtils.flatProperties;
 import static io.microsphere.constants.PathConstants.SLASH_CHAR;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.spring.cloud.client.service.util.ServiceInstanceUtils.getWebEndpointMappings;
-import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction.Config.DEFAULT_CONFIG;
+import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
+import static io.microsphere.spring.cloud.gateway.commons.constants.CommonConstants.APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ALL_SERVICES;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
-import static io.microsphere.util.ArrayUtils.isNotEmpty;
 import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.substringAfter;
 import static java.lang.String.valueOf;
 import static java.net.URI.create;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.stream.Stream.of;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.GATEWAY_ROUTE_ID_ATTR;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.getAttribute;
 import static org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb;
+import static org.springframework.http.server.RequestPath.parse;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.commaDelimitedListToSet;
 import static org.springframework.web.servlet.function.ServerRequest.from;
 import static org.springframework.web.servlet.mvc.method.RequestMappingInfo.paths;
+import static org.springframework.web.util.ServletRequestPathUtils.setParsedRequestPath;
 
 /**
  * The Before-Filter of {@link WebEndpointMapping}
@@ -82,26 +82,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
     private static final Logger logger = getLogger(WebEndpointMappingHandlerFilterFunction.class);
 
-    /**
-     * The all services for mapping
-     */
-    public static final String ALL_SERVICES = "all";
-
-    public static final String SCHEME = "we";
-
-    /**
-     * The key of {@link Config} under {@link RouteProperties#getMetadata() Routes' Metadata}
-     */
-    public static final String METADATA_CONFIG_KEY = "web-endpoint";
-
-    /**
-     * The URI template variable name for application name
-     */
-    public static final String APPLICATION_NAME_URI_TEMPLATE_VARIABLE_NAME = "application";
-
-    static final String NEW_PATH_ATTRIBUTE_NAME = "msg-new-path";
-
-    private final RouteProperties routeProperties;
+    private final String routeId;
 
     @Nonnull
     private DiscoveryClient discoveryClient;
@@ -109,12 +90,12 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
     @Nonnull
     private ApplicationContext context;
 
-    private Collection<RequestMappingContext> requestMappingContexts = new LinkedList<>();
+    volatile Collection<RequestMappingContext> requestMappingContexts = null;
 
-    private Config config;
+    volatile Collection<RequestMappingInfo> excludedRequestMappingInfoSet = null;
 
-    public WebEndpointMappingHandlerFilterFunction(final RouteProperties routeProperties) {
-        this.routeProperties = routeProperties;
+    public WebEndpointMappingHandlerFilterFunction(final String routeId) {
+        this.routeId = routeId;
     }
 
     @Override
@@ -136,10 +117,10 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
         HandlerFilterFunction<ServerResponse, ServerResponse> lbHandlerFunctionDefinition = lb(applicationName);
         Map<String, Object> attributes = request.attributes();
-        String newPath = (String) attributes.remove(NEW_PATH_ATTRIBUTE_NAME);
+        String rewritePath = (String) attributes.remove(WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME);
         int id = requestMappingContext.id;
         ServerRequest newRequest = from(request)
-                .uri(create(newPath))
+                .uri(create(rewritePath))
                 .header(ID_HEADER_NAME, valueOf(id))
                 .build();
 
@@ -154,34 +135,56 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
     }
 
     public void refresh(RouteProperties routeProperties, ApplicationContext context) {
-
         if (context != this.context) {
             return;
         }
 
-        if (!Objects.equals(routeProperties, this.routeProperties)) {
+        if (!Objects.equals(this.routeId, routeProperties.getId())) {
             return;
         }
 
-        Config config = createConfig(routeProperties.getMetadata());
+        Collection<RequestMappingContext> requestMappingContexts = buildRequestMappingContexts(routeProperties);
 
-        Map<WebEndpointMapping, RequestMappingContext> mappedContexts = new HashMap<>();
-        getSubscribedServices(routeProperties.getUri(), config)
-                .stream()
-                .map(discoveryClient::getInstances)
-                // TODO support ZonePreferenceFilter
-                .flatMap(List::stream)
-                .forEach(serviceInstance -> getWebEndpointMappings(serviceInstance)
-                        .stream()
-                        .forEach(webEndpointMapping -> mappedContexts.computeIfAbsent(webEndpointMapping, RequestMappingContext::new)));
-
-        Collection<RequestMappingContext> requestMappingContexts = mappedContexts.values();
+        Set<RequestMappingInfo> excludedRequestMappingInfoSet = buildExcludedRequestMappingInfoSet(routeProperties);
 
         synchronized (routeProperties) {
-            this.config = config;
             this.requestMappingContexts = requestMappingContexts;
+            this.excludedRequestMappingInfoSet = excludedRequestMappingInfoSet;
         }
-        logger.trace("The route properties, configs and request mapping contexts were refreshed!");
+
+        logger.trace("The 'requestMappingContexts' and 'excludedRequestMappingInfoSet' were refreshed!");
+    }
+
+    private Collection<RequestMappingContext> buildRequestMappingContexts(RouteProperties routeProperties) {
+        URI routeUri = routeProperties.getUri();
+        Collection<String> subscribedServices = getSubscribedServices(routeUri);
+        Collection<RequestMappingContext> requestMappingContexts = new LinkedList<>();
+        // TODO support ZonePreferenceFilter
+        for (String subscribedService : subscribedServices) {
+            ServiceInstance sampleServiceInstance = choose(subscribedService);
+            Collection<WebEndpointMapping> webEndpointMappings = getWebEndpointMappings(sampleServiceInstance);
+            for (WebEndpointMapping webEndpointMapping : webEndpointMappings) {
+                RequestMappingContext requestMappingContext = new RequestMappingContext(webEndpointMapping);
+                requestMappingContexts.add(requestMappingContext);
+            }
+        }
+        return requestMappingContexts;
+    }
+
+    private Set<RequestMappingInfo> buildExcludedRequestMappingInfoSet(RouteProperties routeProperties) {
+        WebEndpointConfig webEndpointConfig = getWebEndpointConfig(routeProperties.getMetadata());
+
+        List<WebEndpointConfig.Mapping> excludes = webEndpointConfig.getExcludes();
+        Set<RequestMappingInfo> requestMappingInfoSet = new HashSet<>(excludes.size());
+        for (WebEndpointConfig.Mapping exclude : excludes) {
+            requestMappingInfoSet.add(buildRequestMappingInfo(exclude));
+        }
+        return requestMappingInfoSet;
+    }
+
+    private ServiceInstance choose(String applicationName) {
+        List<ServiceInstance> serviceInstances = this.discoveryClient.getInstances(applicationName);
+        return serviceInstances.stream().findAny().get();
     }
 
     private RequestMappingContext getMatchingRequestMappingContext(String applicationName, ServerRequest request) {
@@ -189,21 +192,17 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         return getMatchingRequestMappingContext(applicationName, routeId, request);
     }
 
-    List<String> getSubscribedServices(URI uri, Config config) {
-        Set<String> excludedServices = config.exclude.getServices();
+    Collection<String> getSubscribedServices(URI uri) {
         String host = uri.getHost();
-        final List<String> services = newArrayList();
         if (ALL_SERVICES.equals(host)) {
-            services.addAll(discoveryClient.getServices());
-        } else {
-            services.addAll(commaDelimitedListToSet(host));
+            return discoveryClient.getServices();
         }
-        services.removeAll(excludedServices);
-        return services;
+        return commaDelimitedListToSet(host);
     }
 
     RequestMappingContext getMatchingRequestMappingContext(String applicationName, String routeId, ServerRequest request) {
-        if (isExcludedRequest(request)) {
+        HttpServletRequest servletRequest = request.servletRequest();
+        if (isExcludedRequest(servletRequest)) {
             // The request is excluded
             logger.trace("The request is excluded");
             return null;
@@ -219,59 +218,43 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
         String path = request.path();
 
-        String newPath = substringAfter(path, SLASH_CHAR + applicationName);
-        request.attributes().put(NEW_PATH_ATTRIBUTE_NAME, newPath);
+        String rewritePath = substringAfter(path, SLASH_CHAR + applicationName);
+        request.attributes().put(WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME, rewritePath);
 
-        HttpServletRequest newServletRequest = new HttpServletRequestWrapper(request.servletRequest()) {
-
-            @Override
-            public String getRequestURI() {
-                return newPath;
-            }
-        };
+        RequestPath rewriteRequestPath = parse(rewritePath, null);
+        setParsedRequestPath(rewriteRequestPath, servletRequest);
 
         List<RequestMappingContext> matchesRequestMappings = newArrayList(requestMappingContexts.size());
         for (RequestMappingContext requestMappingContext : requestMappingContexts) {
-            if (matchesRequestMapping(requestMappingContext, newServletRequest)) {
+            if (matchesRequestMapping(requestMappingContext, servletRequest)) {
                 // matches the request mappings
                 matchesRequestMappings.add(requestMappingContext);
             }
         }
-        matchesRequestMappings.sort((v1, v2) -> v1.compareTo(v2, newServletRequest));
+        matchesRequestMappings.sort((v1, v2) -> v1.compareTo(v2, servletRequest));
 
         return first(matchesRequestMappings);
     }
 
     private boolean matchesRequestMapping(RequestMappingContext requestMappingContext, HttpServletRequest servletRequest) {
         RequestMappingInfo requestMappingInfo = requestMappingContext.requestMappingInfo;
-        return requestMappingInfo.getMatchingCondition(servletRequest) != null;
+        return matches(requestMappingInfo, servletRequest);
     }
 
-    private boolean isExcludedRequest(ServerRequest request) {
-        Config config = getConfig();
-        return config.isExcludedRequest(request);
-    }
-
-    @Nonnull
-    private Config getConfig() {
-        Config config = this.config;
-        if (config == null) {
-            logger.trace("The routed config was not initialized");
-            config = DEFAULT_CONFIG;
-            this.config = config;
+    private boolean isExcludedRequest(HttpServletRequest request) {
+        Collection<RequestMappingInfo> excludedRequestMappingInfoSet = this.excludedRequestMappingInfoSet;
+        if (excludedRequestMappingInfoSet != null) {
+            for (RequestMappingInfo excludedRequestMappingInfo : excludedRequestMappingInfoSet) {
+                if (matches(excludedRequestMappingInfo, request)) {
+                    return true;
+                }
+            }
         }
-        return config;
+        return false;
     }
 
-    static Config createConfig(Map<String, Object> metadata) {
-        Config config = new Config();
-        Map<String, Object> properties = (Map) metadata.getOrDefault(METADATA_CONFIG_KEY, emptyMap());
-        Map<String, Object> flatProperties = flatProperties(properties);
-        ConfigurationBeanBinder beanBinder = new BindableConfigurationBeanBinder();
-        beanBinder.bind(flatProperties, true, true, config);
-        config.init();
-        logger.trace("The routed config was initialized from the properties : {}", flatProperties);
-        return config;
+    private boolean matches(RequestMappingInfo requestMappingInfo, HttpServletRequest servletRequest) {
+        return requestMappingInfo.getMatchingCondition(servletRequest) != null;
     }
 
     static class RequestMappingContext {
@@ -280,15 +263,9 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
         private int id;
 
-        private List<ServiceInstance> serviceInstances = new LinkedList<>();
-
         RequestMappingContext(WebEndpointMapping webEndpointMapping) {
             this.requestMappingInfo = buildRequestMappingInfo(webEndpointMapping);
             this.id = webEndpointMapping.getId();
-        }
-
-        void addServiceInstance(ServiceInstance serviceInstance) {
-            this.serviceInstances.add(serviceInstance);
         }
 
         public int compareTo(RequestMappingContext other, HttpServletRequest request) {
@@ -296,55 +273,14 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         }
     }
 
-    static class Config {
-
-        static final Config DEFAULT_CONFIG = new Config();
-
-        Exclude exclude = new Exclude();
-
-        RequestMappingInfo excludeRequestMappingInfo;
-
-        public void setExclude(Exclude exclude) {
-            this.exclude = exclude;
-        }
-
-        public void init() {
-            Exclude exclude = this.exclude;
-            String[] patterns = exclude.patterns;
-            if (isNotEmpty(patterns)) {
-                this.excludeRequestMappingInfo = paths(patterns).methods(exclude.methods).build();
-            }
-        }
-
-        boolean isExcludedRequest(ServerRequest request) {
-            return excludeRequestMappingInfo == null ? false :
-                    excludeRequestMappingInfo.getMatchingCondition(request.servletRequest()) != null;
-        }
-
-        static class Exclude {
-
-            Set<String> services;
-
-            String[] patterns;
-
-            RequestMethod[] methods;
-
-            public Set<String> getServices() {
-                return services == null ? emptySet() : services;
-            }
-
-            public void setServices(Set<String> services) {
-                this.services = services;
-            }
-
-            public void setPatterns(String[] patterns) {
-                this.patterns = patterns;
-            }
-
-            public void setMethods(RequestMethod[] methods) {
-                this.methods = methods;
-            }
-        }
+    private static RequestMappingInfo buildRequestMappingInfo(WebEndpointConfig.Mapping mapping) {
+        return paths(mapping.getPatterns())
+                .methods(mapping.getMethods())
+                .params(mapping.getParams())
+                .headers(mapping.getHeaders())
+                .consumes(mapping.getConsumes())
+                .produces(mapping.getProduces())
+                .build();
     }
 
     private static RequestMappingInfo buildRequestMappingInfo(WebEndpointMapping webEndpointMapping) {

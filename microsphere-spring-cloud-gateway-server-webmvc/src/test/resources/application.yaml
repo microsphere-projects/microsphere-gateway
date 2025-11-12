@@ -33,44 +33,71 @@ spring:
     gateway:
       mvc:
         routes:
+          - id: request_size_route
+            uri: http://localhost:8080/upload
+            predicates:
+              - Path=/upload
+            filters:
+              - name: RequestSize
+                args:
+                  maxSize: 5000000
+            metadata:
+              a: 1
+          - id: add_response_header_route
+            uri: https://example.org
+            predicates:
+              - Path=/we/*
+            filters:
+              - AddResponseHeader=test-header-name, test-header-value
           - id: web-endpoint-mapping
             uri: we://all
             predicates:
               - Path=/we/{application}/**
             metadata:
               web-endpoint:
-                exclude:
-                  services: test-app-2
-                  patterns: /test-2/**
-                  methods: PUT
-          - id: web-endpoint-mapping-2
-            uri: we://test-app-2
-            predicates:
-              - Path=/wem/{application}/**
-            metadata:
-              web-endpoint:
-                - exclude:
+                excludes:
+                  - patterns: /we/test-app/**
+                    consumes: application/json
+                    produces: plain/text
 
       server:
         webmvc:
           routes:
+            - id: request_size_route
+              uri: http://localhost:8080/upload
+              predicates:
+                - Path=/upload
+              filters:
+                - name: RequestSize
+                  args:
+                    maxSize: 5000000
+              metadata:
+                a: 1
+            - id: retry_test
+              uri: http://localhost:8080/flakey
+              predicates:
+                - Host=*.retry.com
+              filters:
+                - name: Retry
+                  args:
+                    retries: 3
+                    statuses: BAD_GATEWAY
+                    methods: GET,POST
+                    backoff:
+                      firstBackoff: 10ms
+                      maxBackoff: 50ms
+                      factor: 2
+                      basedOnPreviousValue: false
+                    jitter:
+                      randomFactor: 0.5
+                    timeout: 100ms
             - id: web-endpoint-mapping
               uri: we://all
               predicates:
                 - Path=/we/{application}/**
               metadata:
                 web-endpoint:
-                  exclude:
-                    services: test-app-2
-                    patterns: /test-2/**
-                    methods: PUT
-            - id: web-endpoint-mapping-2
-              uri: we://test-app-2
-              predicates:
-                - Path=/wem/{application}/**
-              metadata:
-                web-endpoint:
-                  exclude:
-                    services: test-app-3
-                    patterns: /test-3/**
-                    methods: POST
+                  excludes:
+                    - patterns: /we/test-app/**
+                      consumes: application/json
+                      produces: plain/text

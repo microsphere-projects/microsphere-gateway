@@ -51,7 +51,7 @@ public class WebEndpointMappingHandlerSupplier implements HandlerSupplier {
     public static Result we(RouteProperties routeProperties) {
         String routeId = routeProperties.getId();
         WebEndpointMappingHandlerFilterFunction function = handlerFilterFunctionsCache.computeIfAbsent(routeId,
-                id -> new WebEndpointMappingHandlerFilterFunction(routeProperties));
+                WebEndpointMappingHandlerFilterFunction::new);
         return new Result(http(),
                 ofList(function),
                 emptyList());
