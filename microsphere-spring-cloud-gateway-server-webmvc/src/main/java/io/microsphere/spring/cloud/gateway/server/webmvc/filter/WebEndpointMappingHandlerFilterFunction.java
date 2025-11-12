@@ -18,6 +18,7 @@
 package io.microsphere.spring.cloud.gateway.server.webmvc.filter;
 
 import io.microsphere.annotation.Nonnull;
+import io.microsphere.annotation.Nullable;
 import io.microsphere.logging.Logger;
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfig;
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
@@ -156,17 +157,19 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         logger.trace("The 'requestMappingContexts' and 'excludedRequestMappingInfoSet' were refreshed!");
     }
 
-    private Collection<RequestMappingContext> buildRequestMappingContexts(RouteProperties routeProperties) {
+    Collection<RequestMappingContext> buildRequestMappingContexts(RouteProperties routeProperties) {
         URI routeUri = routeProperties.getUri();
         Collection<String> subscribedServices = getSubscribedServices(routeUri);
         Collection<RequestMappingContext> requestMappingContexts = new LinkedList<>();
         // TODO support ZonePreferenceFilter
         for (String subscribedService : subscribedServices) {
             ServiceInstance sampleServiceInstance = choose(subscribedService);
-            Collection<WebEndpointMapping> webEndpointMappings = getWebEndpointMappings(sampleServiceInstance);
-            for (WebEndpointMapping webEndpointMapping : webEndpointMappings) {
-                RequestMappingContext requestMappingContext = new RequestMappingContext(webEndpointMapping);
-                requestMappingContexts.add(requestMappingContext);
+            if (sampleServiceInstance != null) {
+                Collection<WebEndpointMapping> webEndpointMappings = getWebEndpointMappings(sampleServiceInstance);
+                for (WebEndpointMapping webEndpointMapping : webEndpointMappings) {
+                    RequestMappingContext requestMappingContext = new RequestMappingContext(webEndpointMapping);
+                    requestMappingContexts.add(requestMappingContext);
+                }
             }
         }
         return requestMappingContexts;
@@ -186,9 +189,10 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
         return requestMappingInfoSet;
     }
 
+    @Nullable
     private ServiceInstance choose(String applicationName) {
         List<ServiceInstance> serviceInstances = this.discoveryClient.getInstances(applicationName);
-        return serviceInstances.stream().findAny().get();
+        return serviceInstances.stream().findAny().orElse(null);
     }
 
     private RequestMappingContext getMatchingRequestMappingContext(String applicationName, ServerRequest request) {

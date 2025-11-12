@@ -59,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -189,7 +190,12 @@ class WebEndpointMappingHandlerFilterFunctionTest {
         URI uri = URI.create("we://test-app");
         assertEquals(ofSet("test-app"), function.getSubscribedServices(uri));
 
+        uri = URI.create("we://test-app-1");
         RouteProperties routeProperties = new RouteProperties();
+        routeProperties.setUri(uri);
+        assertTrue(function.buildRequestMappingContexts(routeProperties).isEmpty());
+
+
         routeProperties.setId(routeId + "[0]");
         function.refresh(routeProperties, this.webApplicationContext);
 
