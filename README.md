@@ -8,8 +8,6 @@
 [![Codecov](https://codecov.io/gh/microsphere-projects/microsphere-gateway/branch/dev/graph/badge.svg)](https://app.codecov.io/gh/microsphere-projects/microsphere-gateway)
 ![Maven](https://img.shields.io/maven-central/v/io.github.microsphere-projects/microsphere-gateway.svg)
 ![License](https://img.shields.io/github/license/microsphere-projects/microsphere-gateway.svg)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/microsphere-projects/microsphere-gateway.svg)](http://isitmaintained.com/project/microsphere-projects/microsphere-gateway "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/microsphere-projects/microsphere-gateway.svg)](http://isitmaintained.com/project/microsphere-projects/microsphere-gateway "Percentage of issues still open")
 
 Microsphere Gateway is a sophisticated extension of the Spring Cloud Gateway ecosystem, providing enhanced API gateway
 capabilities with a focus on discovery, routing, and resilience. It offers two complementary implementations: a reactive
@@ -20,8 +18,10 @@ solution based on Spring Cloud Gateway and a servlet-based solution using Spring
 The microsphere-gateway project extends Spring Cloud Gateway with enhanced features including:
 
 - Dual Implementation Strategy: Provides both
-  reactive ([microsphere-spring-cloud-gateway](microsphere-spring-cloud-gateway)) and MVC-based (
-  [microsphere-spring-cloud-gateway-mvc](microsphere-spring-cloud-gateway-mvc)) gateway implementations
+  reactive ([microsphere-spring-cloud-gateway-server-webflux](microsphere-spring-cloud-gateway-server-webflux)) and
+  MVC-based (
+  [microsphere-spring-cloud-gateway-server-webmvc](microsphere-spring-cloud-gateway-server-webmvc)) gateway
+  implementations
 - Enhanced Configuration Management: Centralized dependency management and auto-configuration capabilities
 - Service Discovery Integration: Support for multiple service discovery systems including Eureka, Nacos, Consul, and
   Kubernetes
@@ -29,12 +29,13 @@ The microsphere-gateway project extends Spring Cloud Gateway with enhanced featu
 
 ## Modules
 
-| **Module**                               | **Purpose**                                                                         |
-|------------------------------------------|-------------------------------------------------------------------------------------|
-| **microsphere-gateway-parent**           | Defines the parent POM with dependency management and Spring Cloud version profiles |
-| **microsphere-gateway-dependencies**     | Centralizes dependency management for all project modules                           |
-| **microsphere-spring-cloud-gateway**     | Reactive WebFlux-based gateway implementation                                       |
-| **microsphere-spring-cloud-gateway-mvc** | Servlet-based MVC gateway implementation                                            |
+| **Module**                                          | **Purpose**                                                                         |
+|-----------------------------------------------------|-------------------------------------------------------------------------------------|
+| **microsphere-gateway-parent**                      | Defines the parent POM with dependency management and Spring Cloud version profiles |
+| **microsphere-gateway-dependencies**                | Centralizes dependency management for all project modules                           |
+| **microsphere-spring-cloud-gateway-commons**        | Gateway commons module                                                              |
+| **microsphere-spring-cloud-gateway-server-webflux** | Reactive WebFlux-based gateway implementation                                       |
+| **microsphere-spring-cloud-gateway-server-webmvc**  | Servlet-based MVC gateway implementation                                            |
 
 ## Getting Started
 
@@ -69,11 +70,12 @@ pom.xml:
 Then add the specific modules you need:
 
 ```xml
+
 <dependencies>
-    <!-- Microsphere Spring Cloud Gateway (Reactive) -->
+    <!-- Microsphere Spring Cloud Gateway WebFlux -->
     <dependency>
         <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-spring-cloud-gateway</artifactId>
+        <artifactId>microsphere-spring-cloud-gateway-server-webflux</artifactId>
     </dependency>
 </dependencies>
 ```
@@ -81,11 +83,12 @@ Then add the specific modules you need:
 Using the MVC module if you are using Spring MVC:
 
 ```xml
+
 <dependencies>
-    <!-- Microsphere Spring Cloud Gateway MVC -->
+    <!-- Microsphere Spring Cloud Gateway WebMVC -->
     <dependency>
         <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-spring-cloud-gateway-mvc</artifactId>
+        <artifactId>microsphere-spring-cloud-gateway-server-webmvc</artifactId>
     </dependency>
 </dependencies>
 ```
@@ -143,8 +146,8 @@ We welcome your contributions! Please read [Code of Conduct](./CODE_OF_CONDUCT.m
 
 ### JavaDoc
 
-- [microsphere-spring-cloud-gateway](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway)
-- [microsphere-spring-cloud-gateway-mvc](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-mvc)
+- [microsphere-spring-cloud-gateway-server-webflux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
+- [microsphere-spring-cloud-gateway-server-webmvc](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webmvc)
 
 ## License
 
