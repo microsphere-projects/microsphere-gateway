@@ -58,6 +58,7 @@ import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.substringAfter;
 import static java.lang.String.valueOf;
 import static java.net.URI.create;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Stream.of;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.GATEWAY_ROUTE_ID_ATTR;
@@ -173,6 +174,9 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
     private Set<RequestMappingInfo> buildExcludedRequestMappingInfoSet(RouteProperties routeProperties) {
         WebEndpointConfig webEndpointConfig = getWebEndpointConfig(routeProperties.getMetadata());
+        if (webEndpointConfig == null) {
+            return emptySet();
+        }
 
         List<WebEndpointConfig.Mapping> excludes = webEndpointConfig.getExcludes();
         Set<RequestMappingInfo> requestMappingInfoSet = new HashSet<>(excludes.size());
