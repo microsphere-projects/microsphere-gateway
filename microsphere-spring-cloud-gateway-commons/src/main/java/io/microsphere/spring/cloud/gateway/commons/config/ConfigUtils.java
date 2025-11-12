@@ -26,6 +26,9 @@ import org.springframework.boot.context.properties.bind.validation.ValidationBin
 import org.springframework.core.env.Environment;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.util.Map;
+
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
 import static org.springframework.boot.context.properties.bind.Bindable.of;
 import static org.springframework.boot.context.properties.bind.Binder.get;
 
@@ -59,6 +62,18 @@ public abstract class ConfigUtils implements Utils {
     public static WebEndpointConfig getWebEndpointConfig(Environment environment, String configPrefix) {
         Binder binder = get(environment, springValidatorBindHandler);
         return binder.bind(configPrefix, WEB_ENDPOINT_CONFIG_BINDABLE).orElse(null);
+    }
+
+    /**
+     * Get the {@link WebEndpointConfig} from the specified metadata
+     *
+     * @param metadata the specified {@link Map}
+     * @return If the configuration is not present , return <code>null</code>
+     */
+    @Nullable
+    public static WebEndpointConfig getWebEndpointConfig(Map<String, Object> metadata) {
+        Object webEndpoint = metadata.get(WEB_ENDPOINT_KEY);
+        return webEndpoint instanceof WebEndpointConfig ? (WebEndpointConfig) webEndpoint : null;
     }
 
     private ConfigUtils() {
