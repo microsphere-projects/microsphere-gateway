@@ -33,14 +33,12 @@ spring:
     gateway:
       mvc:
         routes:
-          - id: request_size_route
-            uri: http://localhost:8080/upload
+          - id: add_response_header_route_all
+            uri: https://example.org
             predicates:
-              - Path=/upload
+              - Path=/*
             filters:
-              - name: RequestSize
-                args:
-                  maxSize: 5000000
+              - AddResponseHeader=test-header-name, test-header-value
             metadata:
               a: 1
           - id: add_response_header_route
@@ -63,34 +61,20 @@ spring:
       server:
         webmvc:
           routes:
-            - id: request_size_route
-              uri: http://localhost:8080/upload
+            - id: add_response_header_route_all
+              uri: https://example.org
               predicates:
-                - Path=/upload
+                - Path=/*
               filters:
-                - name: RequestSize
-                  args:
-                    maxSize: 5000000
+                - AddResponseHeader=test-header-name, test-header-value
               metadata:
                 a: 1
-            - id: retry_test
-              uri: http://localhost:8080/flakey
+            - id: add_response_header_route
+              uri: https://example.org
               predicates:
-                - Host=*.retry.com
+                - Path=/we/*
               filters:
-                - name: Retry
-                  args:
-                    retries: 3
-                    statuses: BAD_GATEWAY
-                    methods: GET,POST
-                    backoff:
-                      firstBackoff: 10ms
-                      maxBackoff: 50ms
-                      factor: 2
-                      basedOnPreviousValue: false
-                    jitter:
-                      randomFactor: 0.5
-                    timeout: 100ms
+                - AddResponseHeader=test-header-name, test-header-value
             - id: web-endpoint-mapping
               uri: we://all
               predicates:
