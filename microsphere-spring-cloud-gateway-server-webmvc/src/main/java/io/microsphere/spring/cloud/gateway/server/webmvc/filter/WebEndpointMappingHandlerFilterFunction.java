@@ -148,7 +148,7 @@ public class WebEndpointMappingHandlerFilterFunction implements HandlerFilterFun
 
         Set<RequestMappingInfo> excludedRequestMappingInfoSet = buildExcludedRequestMappingInfoSet(routeProperties);
 
-        synchronized (routeProperties) {
+        synchronized (this) {
             this.requestMappingContexts = requestMappingContexts;
             this.excludedRequestMappingInfoSet = excludedRequestMappingInfoSet;
         }
