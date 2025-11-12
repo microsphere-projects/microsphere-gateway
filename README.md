@@ -26,11 +26,12 @@ The microsphere-gateway project extends Spring Cloud Gateway with enhanced featu
 
 ## Modules
 
-| **Module**                               | **Purpose**                                                                         |
-|------------------------------------------|-------------------------------------------------------------------------------------|
-| **microsphere-gateway-parent**           | Defines the parent POM with dependency management and Spring Cloud version profiles |
-| **microsphere-gateway-dependencies**     | Centralizes dependency management for all project modules                           |
-| **microsphere-spring-cloud-gateway**     | Reactive WebFlux-based gateway implementation                                       |
+| **Module**                                          | **Purpose**                                                                         |
+|-----------------------------------------------------|-------------------------------------------------------------------------------------|
+| **microsphere-gateway-parent**                      | Defines the parent POM with dependency management and Spring Cloud version profiles |
+| **microsphere-gateway-dependencies**                | Centralizes dependency management for all project modules                           |
+| **microsphere-spring-cloud-gateway-commons**        | Gateway commons module                                                              |
+| **microsphere-spring-cloud-gateway-server-webflux** | Reactive WebFlux-based gateway implementation                                       |
 
 ## Getting Started
 
@@ -59,17 +60,18 @@ pom.xml:
 
 | **Branches** | **Purpose**                                 | **Latest Version** |
 |--------------|---------------------------------------------|--------------------|
-| **0.2.x**    | Compatible with Gateway 2022.0.x - 2025.0.x | 0.2.0              |
-| **0.1.x**    | Compatible with Gateway Hoxton - 2021.0.x   | 0.1.0              |
+| **0.2.x**    | Compatible with Gateway 2022.0.x - 2025.0.x | 0.2.1              |
+| **0.1.x**    | Compatible with Gateway Hoxton - 2021.0.x   | 0.1.1              |
 
 Then add the specific modules you need:
 
 ```xml
+
 <dependencies>
-    <!-- Microsphere Spring Cloud Gateway (Reactive) -->
+    <!-- Microsphere Spring Cloud Gateway WebFlux -->
     <dependency>
         <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-spring-cloud-gateway</artifactId>
+        <artifactId>microsphere-spring-cloud-gateway-server-webflux</artifactId>
     </dependency>
 </dependencies>
 ```
@@ -127,7 +129,7 @@ We welcome your contributions! Please read [Code of Conduct](./CODE_OF_CONDUCT.m
 
 ### JavaDoc
 
-- [microsphere-spring-cloud-gateway](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway)
+- [microsphere-spring-cloud-gateway-server-webflux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
 
 ## License
 
