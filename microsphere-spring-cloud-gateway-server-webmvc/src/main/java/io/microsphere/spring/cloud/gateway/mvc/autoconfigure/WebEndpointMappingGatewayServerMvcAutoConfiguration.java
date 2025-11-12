@@ -140,8 +140,8 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
             });
         }
 
-        private void refresh(List<RouteProperties> routes, ApplicationContext context,
-                             Consumer<WebEndpointMappingHandlerFilterFunction> handlerFilterFunctionInitializer) {
+        void refresh(List<RouteProperties> routes, ApplicationContext context,
+                     Consumer<WebEndpointMappingHandlerFilterFunction> handlerFilterFunctionInitializer) {
             for (RouteProperties routeProperties : routes) {
                 String routeID = routeProperties.getId();
                 WebEndpointMappingHandlerFilterFunction handlerFilterFunction = getWebEndpointMappingHandlerFilterFunction(routeID);
@@ -152,7 +152,7 @@ public class WebEndpointMappingGatewayServerMvcAutoConfiguration {
             }
         }
 
-        private List<RouteProperties> findWebEndpointMappingRouteProperties(Set<String> keys) {
+        List<RouteProperties> findWebEndpointMappingRouteProperties(Set<String> keys) {
             List<RouteProperties> routes = getWebEndpointMappingRouteProperties();
             List<RouteProperties> foundRoutes = new LinkedList<>();
             for (String key : keys) {
