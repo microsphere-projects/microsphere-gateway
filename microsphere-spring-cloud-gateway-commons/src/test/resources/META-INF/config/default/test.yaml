@@ -29,13 +29,7 @@ spring:
                 - patterns: /test-2/**
                   methods: POST
                   headers: h=1
-        - id: web-endpoint-mapping
-          uri: we://test
-          predicates:
-            - Path=/{application}/**
+        - id: request_size_route
+          uri: http://localhost:8080/upload
           metadata:
-            web-endpoint:
-              excludes:
-                - patterns: /test-3/abc/**
-                  consumes: application/json
-                  produces: plain/text
+            a: 1
