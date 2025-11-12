@@ -76,7 +76,9 @@ class WebEndpointMappingGatewayServerMvcAutoConfigurationTest {
 
         keys = ofSet(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].id",
                 GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].metadata",
-                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[1].id");
+                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[1].id",
+                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[2].id",
+                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[2].metadata");
         assertFalse(this.webEndpointMappingHandlerConfig.findWebEndpointMappingRouteProperties(keys).isEmpty());
     }
 }
