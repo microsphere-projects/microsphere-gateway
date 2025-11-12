@@ -76,6 +76,7 @@ import static io.microsphere.spring.cloud.gateway.commons.constants.CommonConsta
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ALL_SERVICES;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME;
 import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static io.microsphere.spring.cloud.gateway.server.webflux.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
@@ -106,8 +107,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         EnvironmentAware, DisposableBean, Ordered {
 
     private static final Logger logger = getLogger(WebEndpointMappingGlobalFilter.class);
-
-    static final String NEW_PATH_ATTRIBUTE_NAME = "msg-new-path";
 
     private final DiscoveryClient discoveryClient;
 
@@ -153,13 +152,14 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
             ServiceInstance serviceInstance = choose(applicationName);
             if (serviceInstance != null) {
                 String uri = getUriString(serviceInstance);
-                String path = (String) exchange.getAttributes().remove(NEW_PATH_ATTRIBUTE_NAME);
-                URI targetURI = create(uri + path);
+                Map<String, Object> attributes = exchange.getAttributes();
+                String rewritePath = (String) attributes.remove(WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME);
+                URI targetURI = create(uri + rewritePath);
                 int id = requestMappingContext.id;
                 ServerHttpRequest request = exchange.getRequest()
                         .mutate()
                         .header(ID_HEADER_NAME, valueOf(id)).build();
-                exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, targetURI);
+                attributes.put(GATEWAY_REQUEST_URL_ATTR, targetURI);
                 return chain.filter(exchange.mutate().request(request).build());
             }
         }
@@ -330,9 +330,9 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         String path = requestPath.value();
 
 
-        String newPath = substringAfter(path, SLASH_CHAR + applicationName);
-        exchange.getAttributes().put(NEW_PATH_ATTRIBUTE_NAME, newPath);
-        ServerHttpRequest newRequest = request.mutate().path(newPath).build();
+        String rewritePath = substringAfter(path, SLASH_CHAR + applicationName);
+        exchange.getAttributes().put(WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME, rewritePath);
+        ServerHttpRequest newRequest = request.mutate().path(rewritePath).build();
         ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
 
         List<RequestMappingContext> matchesRequestMappings = newArrayList(requestMappingContexts.size());
