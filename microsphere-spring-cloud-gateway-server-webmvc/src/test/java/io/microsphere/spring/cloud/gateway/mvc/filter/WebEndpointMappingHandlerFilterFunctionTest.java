@@ -23,6 +23,7 @@ import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
 import io.microsphere.spring.test.web.controller.TestController;
 import io.microsphere.spring.webmvc.annotation.EnableWebMvcExtension;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,21 +34,30 @@ import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
+import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.collection.Sets.ofSet;
 import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
+import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -56,6 +66,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static org.springframework.web.servlet.function.ServerRequest.create;
 
 /**
  * {@link WebEndpointMappingHandlerFilterFunction} Test
@@ -167,6 +178,24 @@ class WebEndpointMappingHandlerFilterFunctionTest {
         this.webApplicationContext.publishEvent(new ServiceInstancesChangedEvent(this.registration.getServiceId(), ofList(this.registration)));
 
         assertThrows(Exception.class, () -> this.mockMvc.perform(get("/we/test-app/test/helloworld")));
+
+        testInternalMethods();
+    }
+
+    private void testInternalMethods() {
+        String routeId = "web-endpoint-mapping";
+        WebEndpointMappingHandlerFilterFunction function = getWebEndpointMappingHandlerFilterFunction(routeId);
+        assertSame(emptySet(), function.buildExcludedRequestMappingInfoSet(new RouteProperties()));
+
+        URI uri = URI.create("we://test-app");
+        assertEquals(ofSet("test-app"), function.getSubscribedServices(uri));
+
+        HttpServletRequest request = new MockHttpServletRequest();
+        function.excludedRequestMappingInfoSet = null;
+        assertFalse(function.isExcludedRequest(request));
+
+        function.requestMappingContexts = null;
+        assertNull(function.getMatchingRequestMappingContext("test-app", routeId, create(request, emptyList())));
     }
 
     @Test
