@@ -236,24 +236,24 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
     }
 
     private void refresh() {
-        Map<String, Collection<RequestMappingContext>> routedRequestMappingContextsCache = new ConcurrentHashMap<>();
-        Map<String, Collection<RequestMappingInfo>> routedExcludedRequestMappingInfoCache = new ConcurrentHashMap<>();
+        Map<String, Collection<RequestMappingContext>> routedRequestMappingContextsMap = new ConcurrentHashMap<>();
+        Map<String, Collection<RequestMappingInfo>> routedExcludedRequestMappingInfoMap = new ConcurrentHashMap<>();
         List<RouteDefinition> webEndpointRoutes = getWebEndpointRoutes();
 
         for (RouteDefinition webEndpointRoute : webEndpointRoutes) {
             String routeId = webEndpointRoute.getId();
             URI routeUri = webEndpointRoute.getUri();
             Collection<RequestMappingContext> requestMappingContexts = buildRequestMappingContexts(routeUri);
-            routedRequestMappingContextsCache.put(routeId, requestMappingContexts);
+            routedRequestMappingContextsMap.put(routeId, requestMappingContexts);
 
             Set<RequestMappingInfo> requestMappingInfoSet = buildExcludedRequestMappingInfoSet(webEndpointRoutes, routeId);
-            routedExcludedRequestMappingInfoCache.put(routeId, requestMappingInfoSet);
+            routedExcludedRequestMappingInfoMap.put(routeId, requestMappingInfoSet);
         }
 
         // exchange
         synchronized (this) {
-            this.routedRequestMappingContextsCache = routedRequestMappingContextsCache;
-            this.routedExcludedRequestMappingInfoCache = routedExcludedRequestMappingInfoCache;
+            this.routedRequestMappingContextsCache = routedRequestMappingContextsMap;
+            this.routedExcludedRequestMappingInfoCache = routedExcludedRequestMappingInfoMap;
         }
     }
 
