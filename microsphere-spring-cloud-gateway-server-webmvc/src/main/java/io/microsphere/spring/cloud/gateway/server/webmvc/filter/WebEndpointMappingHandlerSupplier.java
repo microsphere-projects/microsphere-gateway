@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.filter;
+package io.microsphere.spring.cloud.gateway.server.webmvc.filter;
 
 import io.microsphere.spring.web.metadata.WebEndpointMapping;
 import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;

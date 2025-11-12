@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.annotation;
+package io.microsphere.spring.cloud.gateway.server.webmvc.annotation;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
@@ -25,7 +25,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ENABLED_PROPERTY_NAME;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ENABLED_PROPERTY_NAME;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

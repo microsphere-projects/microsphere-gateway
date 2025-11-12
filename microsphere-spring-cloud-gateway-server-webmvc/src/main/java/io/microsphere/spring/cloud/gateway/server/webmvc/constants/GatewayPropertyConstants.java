@@ -14,26 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.microsphere.spring.cloud.gateway.server.webmvc.constants;
 
-package io.microsphere.spring.cloud.gateway.mvc.test;
+import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
 
-import io.microsphere.spring.test.web.controller.TestController;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
+import static io.microsphere.constants.SymbolConstants.DOT;
+import static org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties.PREFIX;
 
 /**
- * TODO
+ * Gateway Property Constants
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see TODO
  * @since 1.0.0
  */
-@EnableAutoConfiguration
-public class TestApplication {
+public interface GatewayPropertyConstants {
 
-    public static void main(String[] args) {
-        new SpringApplicationBuilder(TestApplication.class, TestController.class)
-                .properties("spring.profiles.active=simple-service-registry,gateway")
-                .run(args);
-    }
+    /**
+     * The property name of Gateway enabled.
+     *
+     * @see GatewayMvcProperties#PREFIX
+     */
+    String GATEWAY_ENABLED_PROPERTY_NAME = PREFIX + DOT + ENABLED_PROPERTY_NAME;
+
+    /**
+     * The property prefix of Gateway routes.
+     *
+     * @see GatewayMvcProperties#PREFIX
+     */
+    String GATEWAY_ROUTES_PROPERTY_NAME_PREFIX = PREFIX + DOT + "routes";
 }

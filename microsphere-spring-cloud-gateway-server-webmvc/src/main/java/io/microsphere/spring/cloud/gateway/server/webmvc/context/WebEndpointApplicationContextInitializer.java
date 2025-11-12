@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.context;
+package io.microsphere.spring.cloud.gateway.server.webmvc.context;
 
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindHandlerAdvisor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -25,7 +25,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
 import static io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindHandlerAdvisor.BEAN_NAME;
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 
 /**
  * The {@link ApplicationContextInitializer} for WebEndpoint

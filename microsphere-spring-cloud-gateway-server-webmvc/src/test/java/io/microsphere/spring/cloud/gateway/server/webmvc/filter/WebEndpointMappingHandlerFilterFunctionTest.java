@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.filter;
+package io.microsphere.spring.cloud.gateway.server.webmvc.filter;
 
 
 import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
@@ -50,8 +50,8 @@ import java.util.List;
 
 import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.collection.Sets.ofSet;
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
-import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;

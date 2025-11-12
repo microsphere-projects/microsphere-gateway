@@ -15,21 +15,25 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.constants;
+package io.microsphere.spring.cloud.gateway.server.webmvc.test;
 
-
-import org.junit.jupiter.api.Test;
+import io.microsphere.spring.test.web.controller.TestController;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
- * {@link GatewayPropertyConstants} Test
+ * TODO
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see GatewayPropertyConstants
+ * @see TODO
  * @since 1.0.0
  */
-class GatewayPropertyConstantsTest {
+@EnableAutoConfiguration
+public class TestApplication {
 
-    @Test
-    void testConstants() {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(TestApplication.class, TestController.class)
+                .properties("spring.profiles.active=simple-service-registry,gateway")
+                .run(args);
     }
 }

@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.autoconfigure;
+package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
 
-import io.microsphere.spring.cloud.gateway.mvc.autoconfigure.WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig;
+import io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure.WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

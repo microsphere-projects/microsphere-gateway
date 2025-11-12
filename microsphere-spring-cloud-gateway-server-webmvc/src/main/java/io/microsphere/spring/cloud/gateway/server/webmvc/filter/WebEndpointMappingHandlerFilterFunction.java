@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.spring.cloud.gateway.mvc.filter;
+package io.microsphere.spring.cloud.gateway.server.webmvc.filter;
 
 import io.microsphere.annotation.Nonnull;
 import io.microsphere.logging.Logger;

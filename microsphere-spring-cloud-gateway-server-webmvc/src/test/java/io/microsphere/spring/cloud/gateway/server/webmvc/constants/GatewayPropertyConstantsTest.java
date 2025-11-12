@@ -14,33 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.spring.cloud.gateway.mvc.constants;
 
-import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
+package io.microsphere.spring.cloud.gateway.server.webmvc.constants;
 
-import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
-import static io.microsphere.constants.SymbolConstants.DOT;
-import static org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties.PREFIX;
+
+import org.junit.jupiter.api.Test;
 
 /**
- * Gateway Property Constants
+ * {@link GatewayPropertyConstants} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see GatewayPropertyConstants
  * @since 1.0.0
  */
-public interface GatewayPropertyConstants {
+class GatewayPropertyConstantsTest {
 
-    /**
-     * The property name of Gateway enabled.
-     *
-     * @see GatewayMvcProperties#PREFIX
-     */
-    String GATEWAY_ENABLED_PROPERTY_NAME = PREFIX + DOT + ENABLED_PROPERTY_NAME;
-
-    /**
-     * The property prefix of Gateway routes.
-     *
-     * @see GatewayMvcProperties#PREFIX
-     */
-    String GATEWAY_ROUTES_PROPERTY_NAME_PREFIX = PREFIX + DOT + "routes";
+    @Test
+    void testConstants() {
+    }
 }

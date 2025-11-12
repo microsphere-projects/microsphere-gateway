@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.spring.cloud.gateway.mvc.autoconfigure;
+package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
 import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
-import io.microsphere.spring.cloud.gateway.mvc.annotation.ConditionalOnGatewayServerMvcEnabled;
-import io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerFilterFunction;
+import io.microsphere.spring.cloud.gateway.server.webmvc.annotation.ConditionalOnGatewayServerMvcEnabled;
+import io.microsphere.spring.cloud.gateway.server.webmvc.filter.WebEndpointMappingHandlerFilterFunction;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration;
@@ -49,8 +49,8 @@ import java.util.function.Supplier;
 
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ID_KEY;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
-import static io.microsphere.spring.cloud.gateway.mvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
-import static io.microsphere.spring.cloud.gateway.mvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
+import static io.microsphere.spring.cloud.gateway.server.webmvc.filter.WebEndpointMappingHandlerSupplier.getWebEndpointMappingHandlerFilterFunction;
 import static io.microsphere.util.StringUtils.startsWith;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
