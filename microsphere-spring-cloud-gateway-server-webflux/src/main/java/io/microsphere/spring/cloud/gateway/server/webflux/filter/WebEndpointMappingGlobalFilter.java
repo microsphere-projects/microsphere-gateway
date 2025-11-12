@@ -78,6 +78,7 @@ import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstan
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME;
 import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
+import static io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter.RequestMappingContext.buildRequestMappingInfo;
 import static io.microsphere.spring.cloud.gateway.server.webflux.util.GatewayUtils.isSuccessRouteLocatorEvent;
 import static io.microsphere.spring.web.metadata.WebEndpointMapping.ID_HEADER_NAME;
 import static io.microsphere.spring.web.util.MonoUtils.getValue;
@@ -435,6 +436,33 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         public int compareTo(RequestMappingContext other, ServerWebExchange exchange) {
             return this.requestMappingInfo.compareTo(other.requestMappingInfo, exchange);
         }
+
+        static RequestMappingInfo buildRequestMappingInfo(Mapping mapping) {
+            return paths(mapping.getPatterns())
+                    .methods(mapping.getMethods())
+                    .params(mapping.getParams())
+                    .headers(mapping.getHeaders())
+                    .consumes(mapping.getConsumes())
+                    .produces(mapping.getProduces())
+                    .build();
+        }
+
+        static RequestMappingInfo buildRequestMappingInfo(WebEndpointMapping webEndpointMapping) {
+            RequestMethod[] methods = buildRequestMethods(webEndpointMapping);
+            return paths(webEndpointMapping.getPatterns())
+                    .methods(methods)
+                    .params(webEndpointMapping.getParams())
+                    .headers(webEndpointMapping.getHeaders())
+                    .consumes(webEndpointMapping.getConsumes())
+                    .produces(webEndpointMapping.getProduces())
+                    .build();
+        }
+
+        private static RequestMethod[] buildRequestMethods(WebEndpointMapping webEndpointMapping) {
+            return of(webEndpointMapping.getMethods())
+                    .map(RequestMethod::valueOf)
+                    .toArray(RequestMethod[]::new);
+        }
     }
 
     static String buildPath(ServiceInstance serviceInstance, URI url) {
@@ -451,33 +479,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         }
         String contextPath = metadata.get(WEB_CONTEXT_PATH_METADATA_NAME);
         return buildURI(contextPath, path.substring(servicePath.length()));
-    }
-
-    private static RequestMappingInfo buildRequestMappingInfo(Mapping mapping) {
-        return paths(mapping.getPatterns())
-                .methods(mapping.getMethods())
-                .params(mapping.getParams())
-                .headers(mapping.getHeaders())
-                .consumes(mapping.getConsumes())
-                .produces(mapping.getProduces())
-                .build();
-    }
-
-    private static RequestMappingInfo buildRequestMappingInfo(WebEndpointMapping webEndpointMapping) {
-        RequestMethod[] methods = buildRequestMethods(webEndpointMapping);
-        return paths(webEndpointMapping.getPatterns())
-                .methods(methods)
-                .params(webEndpointMapping.getParams())
-                .headers(webEndpointMapping.getHeaders())
-                .consumes(webEndpointMapping.getConsumes())
-                .produces(webEndpointMapping.getProduces())
-                .build();
-    }
-
-    private static RequestMethod[] buildRequestMethods(WebEndpointMapping webEndpointMapping) {
-        return of(webEndpointMapping.getMethods())
-                .map(RequestMethod::valueOf)
-                .toArray(RequestMethod[]::new);
     }
 
     static void clear(Map<?, ?> map) {
