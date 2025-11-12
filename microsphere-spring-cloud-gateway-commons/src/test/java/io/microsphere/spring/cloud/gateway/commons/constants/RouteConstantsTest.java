@@ -25,6 +25,7 @@ import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstan
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.METADATA_KEY;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.SCHEME;
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_KEY;
+import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -43,5 +44,6 @@ class RouteConstantsTest {
         assertEquals("id", ID_KEY);
         assertEquals("metadata", METADATA_KEY);
         assertEquals("web-endpoint", WEB_ENDPOINT_KEY);
+        assertEquals("msgw-we-rewrite-path", WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME);
     }
 }
