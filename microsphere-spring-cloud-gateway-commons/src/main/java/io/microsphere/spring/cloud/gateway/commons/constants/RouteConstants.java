@@ -28,6 +28,16 @@ import io.microsphere.spring.web.metadata.WebEndpointMapping;
 public interface RouteConstants {
 
     /**
+     * The scheme for {@link WebEndpointMapping} Route
+     */
+    String SCHEME = "we";
+
+    /**
+     * The all services for mapping
+     */
+    String ALL_SERVICES = "all";
+
+    /**
      * The key of the Routes' ID
      */
     String ID_KEY = "id";
