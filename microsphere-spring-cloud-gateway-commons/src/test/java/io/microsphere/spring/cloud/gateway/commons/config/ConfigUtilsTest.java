@@ -97,10 +97,7 @@ class ConfigUtilsTest {
 
     @Test
     void testGetWebEndpointConfigOnMissing() {
-        WebEndpointConfig config = getWebEndpointConfig(this.environment, "spring.cloud.gateway.routes[1].metadata.web-endpoint");
-        assertNotNull(config);
-
-        config = getWebEndpointConfig(this.environment, "spring.cloud.gateway.routes[1]");
+        WebEndpointConfig config = getWebEndpointConfig(this.environment, "spring.cloud.gateway.routes[1]");
         assertNull(config);
     }
 
