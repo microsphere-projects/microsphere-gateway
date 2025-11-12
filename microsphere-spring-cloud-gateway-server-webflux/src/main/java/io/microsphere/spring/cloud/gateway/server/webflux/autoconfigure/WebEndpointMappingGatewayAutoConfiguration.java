@@ -19,7 +19,6 @@ package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapter;
 import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
-import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindHandlerAdvisor;
 import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayEnabled;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -33,7 +32,6 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static io.microsphere.spring.cloud.gateway.server.webflux.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
 import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CURRENT;
 
 /**
@@ -60,11 +58,6 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
         }
 )
 public class WebEndpointMappingGatewayAutoConfiguration {
-
-    @Bean
-    public static WebEndpointConfigurationPropertiesBindHandlerAdvisor webEndpointConfigurationPropertiesBindHandlerAdvisor() {
-        return new WebEndpointConfigurationPropertiesBindHandlerAdvisor(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX);
-    }
 
     @Bean
     @ConditionalOnEnabledGlobalFilter

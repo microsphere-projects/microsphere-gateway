@@ -1,0 +1,2 @@
+org.springframework.context.ApplicationContextInitializer=\
+io.microsphere.spring.cloud.gateway.server.webflux.context.WebEndpointApplicationContextInitializer

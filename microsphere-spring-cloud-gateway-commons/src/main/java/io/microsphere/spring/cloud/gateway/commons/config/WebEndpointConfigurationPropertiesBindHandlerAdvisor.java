@@ -44,6 +44,8 @@ import static io.microsphere.util.Assert.assertNotBlank;
 public class WebEndpointConfigurationPropertiesBindHandlerAdvisor implements ConfigurationPropertiesBindHandlerAdvisor,
         EnvironmentAware {
 
+    public static final String BEAN_NAME = "webEndpointConfigurationPropertiesBindHandlerAdvisor";
+
     private final String gatewayRoutesPropertyNamePrefix;
 
     private Environment environment;
