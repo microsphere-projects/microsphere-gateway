@@ -18,12 +18,15 @@
 package io.microsphere.spring.cloud.gateway.commons.config.server.nacos.autoconfigure;
 
 
+import io.microsphere.spring.cloud.gateway.commons.config.server.nacos.environment.NacosEnvironmentRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cloud.config.environment.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,6 +36,7 @@ import org.testcontainers.junit.jupiter.EnabledIfDockerAvailable;
 import java.io.File;
 import java.net.URL;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.testcontainers.containers.wait.strategy.Wait.forLogMessage;
 
 /**
@@ -62,7 +66,7 @@ class NacosConfigServerAutoConfigurationIntegrationTest {
         URL resource = classLoader.getResource("META-INF/docker/service-registry-servers.yml");
         File dockerComposeFile = new File(resource.toURI());
         composeContainer = new ComposeContainer(dockerComposeFile);
-        composeContainer.waitingFor("nacos", forLogMessage(".*Nacos started successfully.*", 1))
+        composeContainer.waitingFor("nacos", forLogMessage(".*started successfully.*", 1))
                 .start();
     }
 
@@ -71,8 +75,12 @@ class NacosConfigServerAutoConfigurationIntegrationTest {
         composeContainer.stop();
     }
 
+    @Autowired
+    private NacosEnvironmentRepository nacosEnvironmentRepository;
+
     @Test
     void test() {
-
+        Environment environment = nacosEnvironmentRepository.findOne("test", "default", null);
+        assertNotNull(environment);
     }
 }
