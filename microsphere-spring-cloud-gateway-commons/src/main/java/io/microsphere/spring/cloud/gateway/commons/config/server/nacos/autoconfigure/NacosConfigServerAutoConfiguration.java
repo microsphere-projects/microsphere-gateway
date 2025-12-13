@@ -18,8 +18,6 @@
 package io.microsphere.spring.cloud.gateway.commons.config.server.nacos.autoconfigure;
 
 
-import com.alibaba.cloud.nacos.NacosConfigAutoConfiguration;
-import com.alibaba.cloud.nacos.NacosConfigEnabledCondition;
 import com.alibaba.cloud.nacos.NacosConfigManager;
 import com.alibaba.cloud.nacos.NacosConfigProperties;
 import io.microsphere.spring.cloud.gateway.commons.config.server.nacos.environment.NacosEnvironmentRepository;
@@ -29,10 +27,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.config.server.EnableConfigServer;
-import org.springframework.cloud.config.server.config.ConfigServerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import static org.springframework.cloud.config.server.config.ConfigServerProperties.PREFIX;
@@ -43,11 +38,11 @@ import static org.springframework.cloud.config.server.config.ConfigServerPropert
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-@ConditionalOnClass(EnableConfigServer.class) // If class of @EnableConfigServer is present in class-path
+@ConditionalOnClass(name = "org.springframework.cloud.config.server.EnableConfigServer")
 @ConditionalOnProperty(prefix = PREFIX, name = "enabled", matchIfMissing = true)
-@Conditional(NacosConfigEnabledCondition.class)
-@AutoConfigureBefore(ConfigServerAutoConfiguration.class)
-@AutoConfigureAfter(NacosConfigAutoConfiguration.class)
+@ConditionalOnProperty(prefix = "spring.nacos.config", name = "enabled", matchIfMissing = true)
+@AutoConfigureBefore(name = "org.springframework.cloud.config.server.config.ConfigServerAutoConfiguration")
+@AutoConfigureAfter(name = "com.alibaba.cloud.nacos.NacosConfigAutoConfiguration")
 @Configuration(proxyBeanMethods = false)
 public class NacosConfigServerAutoConfiguration {
 
