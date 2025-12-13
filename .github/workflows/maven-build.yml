@@ -26,10 +26,10 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v5
 
-      - name: Setup Testcontainers Cloud Client
-        uses: atomicjar/testcontainers-cloud-setup-action@v1
+      - name: Docker Setup Compose
+        uses: docker/setup-compose-action@v1.2.0
         with:
-          token: ${{ secrets.TC_CLOUD_TOKEN }}
+          version: latest
 
       - name: Setup JDK ${{ matrix.Java }}
         uses: actions/setup-java@v5
