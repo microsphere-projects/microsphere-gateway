@@ -30,8 +30,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static org.springframework.cloud.config.server.config.ConfigServerProperties.PREFIX;
-
 /**
  * Nacos Config Server Auto-Configuration.
  *
@@ -39,8 +37,7 @@ import static org.springframework.cloud.config.server.config.ConfigServerPropert
  * @since 1.0.0
  */
 @ConditionalOnClass(name = "org.springframework.cloud.config.server.EnableConfigServer")
-@ConditionalOnProperty(prefix = PREFIX, name = "enabled", matchIfMissing = true)
-@ConditionalOnProperty(prefix = "spring.nacos.config", name = "enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = {"spring.cloud.config.server.enabled", "spring.nacos.config.enabled"}, matchIfMissing = true)
 @AutoConfigureBefore(name = "org.springframework.cloud.config.server.config.ConfigServerAutoConfiguration")
 @AutoConfigureAfter(name = "com.alibaba.cloud.nacos.NacosConfigAutoConfiguration")
 @Configuration(proxyBeanMethods = false)
