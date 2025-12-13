@@ -24,15 +24,14 @@ import com.alibaba.nacos.api.config.ConfigService;
 import org.springframework.cloud.config.environment.Environment;
 import org.springframework.cloud.config.environment.PropertySource;
 import org.springframework.cloud.config.server.environment.EnvironmentRepository;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
 
-import static com.alibaba.nacos.api.common.Constants.DEFAULT_GROUP;
 import static io.microsphere.lang.function.ThrowableSupplier.execute;
 import static java.lang.String.format;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * Nacos {@link EnvironmentRepository}.
@@ -54,11 +53,19 @@ public class NacosEnvironmentRepository implements EnvironmentRepository {
     @Override
     public Environment findOne(String application, String profile, String label) {
 
-        String dataId = application + "-" + profile + ".properties";
+        String dataId = resolveDataId(application, profile);
 
-        String configContent = execute(() -> configService.getConfig(dataId, DEFAULT_GROUP, this.nacosConfigProperties.getTimeout()));
+        String configContent = execute(() -> configService.getConfig(dataId, nacosConfigProperties.getGroup(), this.nacosConfigProperties.getTimeout()));
 
         return createEnvironment(configContent, application, profile);
+    }
+
+    protected String resolveDataId(String application, String profile) {
+        return application + "-" + resolveProfile(profile) + ".properties";
+    }
+
+    protected String resolveProfile(String profile) {
+        return hasText(profile) ? profile : "default";
     }
 
     private Environment createEnvironment(String configContent, String application,
@@ -68,7 +75,7 @@ public class NacosEnvironmentRepository implements EnvironmentRepository {
 
         Properties properties = createProperties(configContent);
 
-        String propertySourceName = format("Nacos[application : %s , profile : %s]", application, profile);
+        String propertySourceName = format("Nacos[application : '%s' , profile : '%s']", application, profile);
 
         PropertySource propertySource = new PropertySource(propertySourceName,
                 properties);
@@ -80,7 +87,7 @@ public class NacosEnvironmentRepository implements EnvironmentRepository {
 
     private Properties createProperties(String configContent) {
         Properties properties = new Properties();
-        if (StringUtils.hasText(configContent)) {
+        if (hasText(configContent)) {
             try {
                 properties.load(new StringReader(configContent));
             } catch (IOException e) {
