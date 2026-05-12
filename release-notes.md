@@ -22,3 +22,25 @@
 
 For full details, visit the [commit history](https://example.com/commit-history).
 
+## v0.2.4
+
+# Release Notes - Version 0.2.4
+
+## Dependency Updates
+- Bumped `microsphere Spring Cloud` to `0.2.11`. ([d4738de](https://github.com/...))
+
+## Bug Fixes
+- Fixed indentation issues in `dependabot.yml`. ([4fa0e94](https://github.com/...))
+
+## Documentation
+- Updated branch versions in `README`. ([aed9fe4](https://github.com/...))
+- Improved release notes and automated release creation process. ([12eacd8](https://github.com/...))
+
+## Build and Workflow Enhancements
+- Removed trailing newline in `generate-wiki-docs.py`. ([a398e96](https://github.com/...))
+
+---
+
+For a detailed list of changes, refer to the [full changelog](https://github.com/.../compare/v0.2.3...v0.2.4).
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.3...0.2.4
