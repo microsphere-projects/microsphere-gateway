@@ -43,4 +43,22 @@ For full details, visit the [commit history](https://example.com/commit-history)
 
 For a detailed list of changes, refer to the [full changelog](https://github.com/.../compare/v0.2.3...v0.2.4).
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.3...0.2.4
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.3...0.2.4## v0.2.5
+
+# Release Notes - Version 0.2.5
+
+## Dependency Updates
+- Bumped `microsphere-spring-cloud` dependency to `0.2.12`. ([7673b5d](#))
+
+## Build and Workflow Enhancements
+- Added OSSRH credentials to Maven publish workflow to streamline deployment. ([5d4f530](#))
+- Adjusted Maven GitHub Actions and fixed EOF issues. ([70725f9](#))
+
+## Documentation
+- Updated README to reflect changes in branches and versions. ([e744b5c](#))
+
+---
+
+No other changes.
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.4...0.2.5
