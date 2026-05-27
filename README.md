@@ -153,6 +153,7 @@ and [Server MVC](https://javadoc.io/doc/io.github.microsphere-projects/microsphe
 ## Maintainers and Contributing
 
 This project is maintained by the [Microsphere organization](https://github.com/microsphere-projects).
+Lead developer: [Mercy Ma](https://github.com/mercyblitz) (`mercyblitz@gmail.com`).
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 - Follow the community expectations in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
