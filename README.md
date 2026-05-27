@@ -146,11 +146,10 @@ microsphere:
 
 - [Issue tracker](https://github.com/microsphere-projects/microsphere-gateway/issues) for bugs and feature requests
 - [Project wiki](https://github.com/microsphere-projects/microsphere-gateway/wiki) for broader documentation
-- [DeepWiki](https://deepwiki.com/microsphere-projects/microsphere-gateway)
-  and [ZRead](https://zread.ai/microsphere-projects/microsphere-gateway) for browsable project context
--
-Javadocs: [WebFlux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
-and [Server MVC](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webmvc)
+- [DeepWiki](https://deepwiki.com/microsphere-projects/microsphere-gateway) and [ZRead](https://zread.ai/microsphere-projects/microsphere-gateway) for browsable project context
+- Javadocs:
+  - [WebFlux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
+  - [Server MVC](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webmvc)
 
 ## Maintainers and Contributing
 
