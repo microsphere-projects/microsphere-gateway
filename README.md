@@ -1,53 +1,50 @@
 # Microsphere Gateway
 
-> Microsphere Projects for Gateway
-
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/microsphere-projects/microsphere-gateway)
-[![zread](https://img.shields.io/badge/Ask_Zread-_.svg?style=flat&color=00b0aa&labelColor=000000&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuOTYxNTYgMS42MDAxSDIuMjQxNTZDMS44ODgxIDEuNjAwMSAxLjYwMTU2IDEuODg2NjQgMS42MDE1NiAyLjI0MDFWNC45NjAxQzEuNjAxNTYgNS4zMTM1NiAxLjg4ODEgNS42MDAxIDIuMjQxNTYgNS42MDAxSDQuOTYxNTZDNS4zMTUwMiA1LjYwMDEgNS42MDE1NiA1LjMxMzU2IDUuNjAxNTYgNC45NjAxVjIuMjQwMUM1LjYwMTU2IDEuODg2NjQgNS4zMTUwMiAxLjYwMDEgNC45NjE1NiAxLjYwMDFaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00Ljk2MTU2IDEwLjM5OTlIMi4yNDE1NkMxLjg4ODEgMTAuMzk5OSAxLjYwMTU2IDEwLjY4NjQgMS42MDE1NiAxMS4wMzk5VjEzLjc1OTlDMS42MDE1NiAxNC4xMTM0IDEuODg4MSAxNC4zOTk5IDIuMjQxNTYgMTQuMzk5OUg0Ljk2MTU2QzUuMzE1MDIgMTQuMzk5OSA1LjYwMTU2IDE0LjExMzQgNS42MDE1NiAxMy43NTk5VjExLjAzOTlDNS42MDE1NiAxMC42ODY0IDUuMzE1MDIgMTAuMzk5OSA0Ljk2MTU2IDEwLjM5OTlaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik0xMy43NTg0IDEuNjAwMUgxMS4wMzg0QzEwLjY4NSAxLjYwMDEgMTAuMzk4NCAxLjg4NjY0IDEwLjM5ODQgMi4yNDAxVjQuOTYwMUMxMC4zOTg0IDUuMzEzNTYgMTAuNjg1IDUuNjAwMSAxMS4wMzg0IDUuNjAwMUgxMy43NTg0QzE0LjExMTkgNS42MDAxIDE0LjM5ODQgNS4zMTM1NiAxNC4zOTg0IDQuOTYwMVYyLjI0MDFDMTQuMzk4NCAxLjg4NjY0IDE0LjExMTkgMS42MDAxIDEzLjc1ODQgMS42MDAxWiIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNNCAxMkwxMiA0TDQgMTJaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00IDEyTDEyIDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K&logoColor=ffffff)](https://zread.ai/microsphere-projects/microsphere-gateway)
 [![Maven Build](https://github.com/microsphere-projects/microsphere-gateway/actions/workflows/maven-build.yml/badge.svg)](https://github.com/microsphere-projects/microsphere-gateway/actions/workflows/maven-build.yml)
-[![Codecov](https://codecov.io/gh/microsphere-projects/microsphere-gateway/branch/dev/graph/badge.svg)](https://app.codecov.io/gh/microsphere-projects/microsphere-gateway)
-![Maven](https://img.shields.io/maven-central/v/io.github.microsphere-projects/microsphere-gateway.svg)
-![License](https://img.shields.io/github/license/microsphere-projects/microsphere-gateway.svg)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.microsphere-projects/microsphere-gateway-dependencies.svg)](https://search.maven.org/artifact/io.github.microsphere-projects/microsphere-gateway-dependencies)
+[![License](https://img.shields.io/github/license/microsphere-projects/microsphere-gateway.svg)](LICENSE)
 
-Microsphere Gateway is a sophisticated extension of the Spring Cloud Gateway ecosystem, providing enhanced API gateway
-capabilities with a focus on discovery, routing, and resilience. It offers two complementary implementations: a reactive
-solution based on Spring Cloud Gateway and a servlet-based solution using Spring MVC.
+Microsphere Gateway extends the Spring Cloud Gateway ecosystem with Microsphere-specific routing, service discovery, and
+refresh behavior. It provides both reactive and servlet-based gateway modules so you can expose discovered service web
+endpoints behind a single gateway without duplicating route definitions in every service.
 
-## Purpose and Scope
+## Why It's Useful
 
-The microsphere-gateway project extends Spring Cloud Gateway with enhanced features including:
-
-- Dual Implementation Strategy: Provides both
-  reactive ([microsphere-spring-cloud-gateway-server-webflux](microsphere-spring-cloud-gateway-server-webflux)) and
-  MVC-based (
-  [microsphere-spring-cloud-gateway-server-webmvc](microsphere-spring-cloud-gateway-server-webmvc)) gateway
-  implementations
-- Enhanced Configuration Management: Centralized dependency management and auto-configuration capabilities
-- Service Discovery Integration: Support for multiple service discovery systems including Eureka, Nacos, Consul, and
-  Kubernetes
-- Enterprise Features: Built-in fault tolerance, caching, and monitoring capabilities
+- **Use the stack you already run** with dedicated modules for Spring Cloud Gateway WebFlux and Spring Cloud Gateway
+  Server MVC.
+- **Route discovered web endpoints dynamically** through the custom `we://` route scheme backed by Spring Cloud
+  discovery.
+- **Keep routes current** when gateway configuration, route definitions, or service instances change.
+- **Refine exposure rules per route** with `metadata.web-endpoint.excludes` filters for paths, methods, headers, params,
+  consumes, and produces.
+- **Adopt consistently across modules** with a BOM and shared commons module.
 
 ## Modules
 
-| **Module**                                          | **Purpose**                                                                         |
-|-----------------------------------------------------|-------------------------------------------------------------------------------------|
-| **microsphere-gateway-parent**                      | Defines the parent POM with dependency management and Spring Cloud version profiles |
-| **microsphere-gateway-dependencies**                | Centralizes dependency management for all project modules                           |
-| **microsphere-spring-cloud-gateway-commons**        | Gateway commons module                                                              |
-| **microsphere-spring-cloud-gateway-server-webflux** | Reactive WebFlux-based gateway implementation                                       |
-| **microsphere-spring-cloud-gateway-server-webmvc**  | Servlet-based MVC gateway implementation                                            |
+| Module                                            | Purpose                                                               |
+|---------------------------------------------------|-----------------------------------------------------------------------|
+| `microsphere-gateway-parent`                      | Parent POM and shared build configuration                             |
+| `microsphere-gateway-dependencies`                | BOM for dependency management                                         |
+| `microsphere-spring-cloud-gateway-commons`        | Shared constants, annotations, and configuration binding              |
+| `microsphere-spring-cloud-gateway-server-webflux` | Reactive gateway integration for Spring Cloud Gateway                 |
+| `microsphere-spring-cloud-gateway-server-webmvc`  | Servlet-based gateway integration for Spring Cloud Gateway Server MVC |
 
 ## Getting Started
 
-The easiest way to get started is by adding the Microsphere Gateway BOM (Bill of Materials) to your project's
-pom.xml:
+### Prerequisites
+
+- JDK 17 or newer
+- Maven 3.9+ or the included Maven Wrapper
+- A Spring Cloud application using a supported release train
+- A discovery client setup for the services you want the gateway to route to
+
+The CI build covers Java 17, 21, and 25 against Spring Cloud `2022`, `2023`, `2024`, and `2025` profiles.
+
+### 1. Import the BOM
 
 ```xml
-
 <dependencyManagement>
     <dependencies>
-        ...
-        <!-- Microsphere Gateway Dependencies -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-gateway-dependencies</artifactId>
@@ -55,100 +52,111 @@ pom.xml:
             <type>pom</type>
             <scope>import</scope>
         </dependency>
-        ...
     </dependencies>
 </dependencyManagement>
 ```
 
-`${microsphere-spring-boot.version}` has two branches:
+### 2. Add the Gateway Module You Need
 
-| **Branches** | **Purpose**                                      | **Latest Version** |
-|--------------|--------------------------------------------------|--------------------|
-| **main**     | Compatible with Spring Cloud 2022.0.x - 2025.0.x | 0.2.5              |
-| **1.x**      | Compatible with Spring Cloud Hoxton - 2021.0.x   | 0.1.5              |
-
-Then add the specific modules you need:
+**WebFlux**
 
 ```xml
-
-<dependencies>
-    <!-- Microsphere Spring Cloud Gateway WebFlux -->
-    <dependency>
-        <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-spring-cloud-gateway-server-webflux</artifactId>
-    </dependency>
-</dependencies>
+<dependency>
+    <groupId>io.github.microsphere-projects</groupId>
+    <artifactId>microsphere-spring-cloud-gateway-server-webflux</artifactId>
+</dependency>
 ```
 
-Using the MVC module if you are using Spring MVC:
+**Server MVC**
 
 ```xml
-
-<dependencies>
-    <!-- Microsphere Spring Cloud Gateway WebMVC -->
-    <dependency>
-        <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-spring-cloud-gateway-server-webmvc</artifactId>
-    </dependency>
-</dependencies>
+<dependency>
+    <groupId>io.github.microsphere-projects</groupId>
+    <artifactId>microsphere-spring-cloud-gateway-server-webmvc</artifactId>
+</dependency>
 ```
 
-## Building from Source
+### 3. Configure a Web Endpoint Mapping Route
 
-You don't need to build from source unless you want to try out the latest code or contribute to the project.
+`we://all` subscribes to all discovered services. You can also target specific services with hosts such as
+`we://orders-service` or `we://orders-service,payments-service`.
 
-To build the project, follow these steps:
+The target services must publish Microsphere web endpoint metadata so the gateway can discover request mappings and
+rewrite incoming paths correctly.
 
-1. Clone the repository:
+**WebFlux**
 
-```bash
-git clone https://github.com/microsphere-projects/microsphere-gateway.git
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: web-endpoint-mapping
+          uri: we://all
+          predicates:
+            - Path=/{application}/**
+          metadata:
+            web-endpoint:
+              excludes:
+                - patterns: /internal/**
+                  methods: GET
 ```
 
-2. Build the source:
+**Server MVC**
 
-- Linux/MacOS:
+```yaml
+spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: web-endpoint-mapping
+            uri: we://all
+            predicates:
+              - Path=/{application}/**
+            metadata:
+              web-endpoint:
+                excludes:
+                  - patterns: /internal/**
+                    methods: GET
+```
+
+By default, Microsphere Gateway is enabled. You can turn features off with:
+
+```yaml
+microsphere:
+  spring:
+    cloud:
+      gateway:
+        enabled: false
+      web-endpoint-mapping:
+        enabled: false
+```
+
+### 4. Build or Test Locally
 
 ```bash
 ./mvnw package
+./mvnw test -Ptest,spring-cloud-2025
 ```
 
-- Windows:
+## Getting Help
 
-```powershell
-mvnw.cmd package
-```
+- [Issue tracker](https://github.com/microsphere-projects/microsphere-gateway/issues) for bugs and feature requests
+- [Project wiki](https://github.com/microsphere-projects/microsphere-gateway/wiki) for broader documentation
+- [DeepWiki](https://deepwiki.com/microsphere-projects/microsphere-gateway)
+  and [ZRead](https://zread.ai/microsphere-projects/microsphere-gateway) for browsable project context
+-
+Javadocs: [WebFlux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
+and [Server MVC](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webmvc)
 
-## Contributing
+## Maintainers and Contributing
 
-We welcome your contributions! Please read [Code of Conduct](./CODE_OF_CONDUCT.md) before submitting a pull request.
+This project is maintained by the [Microsphere organization](https://github.com/microsphere-projects).
 
-## Reporting Issues
-
-* Before you log a bug, please search
-  the [issues](https://github.com/microsphere-projects/microsphere-gateway/issues)
-  to see if someone has already reported the problem.
-* If the issue doesn't already
-  exist, [create a new issue](https://github.com/microsphere-projects/microsphere-gateway/issues/new).
-* Please provide as much information as possible with the issue report.
-
-## Documentation
-
-### User Guide
-
-[DeepWiki Host](https://deepwiki.com/microsphere-projects/microsphere-gateway)
-
-[ZRead Host](https://zread.ai/microsphere-projects/microsphere-gateway)
-
-### Wiki
-
-[Github Host](https://github.com/microsphere-projects/microsphere-gateway/wiki)
-
-### JavaDoc
-
-- [microsphere-spring-cloud-gateway-server-webflux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
-- [microsphere-spring-cloud-gateway-server-webmvc](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webmvc)
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+- Follow the community expectations in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## License
 
-The Microsphere Gateway is released under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+Distributed under the [Apache License 2.0](LICENSE).
