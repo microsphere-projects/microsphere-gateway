@@ -1,8 +1,10 @@
 # Microsphere Gateway
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/microsphere-projects/microsphere-gateway)
 [![Maven Build](https://github.com/microsphere-projects/microsphere-gateway/actions/workflows/maven-build.yml/badge.svg)](https://github.com/microsphere-projects/microsphere-gateway/actions/workflows/maven-build.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.microsphere-projects/microsphere-gateway-dependencies.svg)](https://search.maven.org/artifact/io.github.microsphere-projects/microsphere-gateway-dependencies)
-[![License](https://img.shields.io/github/license/microsphere-projects/microsphere-gateway.svg)](LICENSE)
+[![Codecov](https://codecov.io/gh/microsphere-projects/microsphere-gateway/branch/main/graph/badge.svg)](https://app.codecov.io/gh/microsphere-projects/microsphere-gateway)
+![Maven](https://img.shields.io/maven-central/v/io.github.microsphere-projects/microsphere-gateway.svg)
+![License](https://img.shields.io/github/license/microsphere-projects/microsphere-gateway.svg)
 
 Microsphere Gateway extends the Spring Cloud Gateway ecosystem with Microsphere-specific routing, service discovery, and
 refresh behavior. It provides both reactive and servlet-based gateway modules so you can expose discovered service web
