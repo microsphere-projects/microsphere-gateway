@@ -17,7 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
-
 import io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure.WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

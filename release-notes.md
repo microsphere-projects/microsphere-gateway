@@ -61,4 +61,23 @@ For a detailed list of changes, refer to the [full changelog](https://github.com
 
 No other changes.
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.4...0.2.5
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.4...0.2.5## v0.2.6
+
+# Release Notes for v0.2.6
+
+## New Features
+- Added Copilot instructions for `microsphere-gateway`. (#d414d84)
+- Introduced agents/prompts and updated the `CONTRIBUTING.md` file. (#77e94c0)
+
+## Documentation
+- Reformatted README project links and Javadocs. (#10fc70a)
+- Updated README badges. (#08a7311)
+
+## Dependency Updates
+- Upgraded `microsphere Spring Cloud` to version `0.2.13`. (#4905cd6)
+
+---
+
+For more details, see the [Full Changelog](https://github.com/your-repo/compare/0.2.5...0.2.6).
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.5...0.2.6
