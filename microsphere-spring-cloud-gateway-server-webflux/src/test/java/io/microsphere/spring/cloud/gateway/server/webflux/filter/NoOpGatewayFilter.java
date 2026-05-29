@@ -38,4 +38,3 @@ public class NoOpGatewayFilter implements GatewayFilter {
         return empty();
     }
 }
-
