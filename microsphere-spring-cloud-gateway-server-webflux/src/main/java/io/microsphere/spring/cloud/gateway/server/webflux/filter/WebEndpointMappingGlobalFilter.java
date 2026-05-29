@@ -331,7 +331,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         RequestPath requestPath = request.getPath();
         String path = requestPath.value();
 
-
         String rewritePath = substringAfter(path, SLASH_CHAR + applicationName);
         exchange.getAttributes().put(WEB_ENDPOINT_REWRITE_PATH_ATTRIBUTE_NAME, rewritePath);
         ServerHttpRequest newRequest = request.mutate().path(rewritePath).build();
@@ -402,7 +401,6 @@ public class WebEndpointMappingGlobalFilter implements GlobalFilter, SmartApplic
         }
         return webEndpointRoutes;
     }
-
 
     Collection<String> getSubscribedServices(URI routeUri) {
         String host = routeUri.getHost();

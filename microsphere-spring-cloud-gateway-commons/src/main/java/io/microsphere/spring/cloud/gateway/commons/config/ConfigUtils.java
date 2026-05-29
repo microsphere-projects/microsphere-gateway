@@ -79,3 +79,4 @@ public abstract class ConfigUtils implements Utils {
     private ConfigUtils() {
     }
 }
+

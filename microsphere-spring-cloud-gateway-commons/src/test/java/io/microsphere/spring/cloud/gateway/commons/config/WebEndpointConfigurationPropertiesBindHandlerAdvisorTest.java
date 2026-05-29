@@ -17,7 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.commons.config;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.bind.BindHandler;
