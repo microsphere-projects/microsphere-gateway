@@ -17,7 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.server.webmvc.constants;
 
-
 import org.junit.jupiter.api.Test;
 
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;

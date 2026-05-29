@@ -17,7 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.server.webmvc.filter;
 
-
 import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
@@ -146,7 +145,6 @@ class WebEndpointMappingHandlerFilterFunctionTest {
 
     private MockMvc mockMvc;
 
-
     @BeforeEach
     void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
@@ -194,7 +192,6 @@ class WebEndpointMappingHandlerFilterFunctionTest {
         RouteProperties routeProperties = new RouteProperties();
         routeProperties.setUri(uri);
         assertTrue(function.buildRequestMappingContexts(routeProperties).isEmpty());
-
 
         routeProperties.setId(routeId + "[0]");
         function.refresh(routeProperties, this.webApplicationContext);

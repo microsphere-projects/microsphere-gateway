@@ -17,7 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
-
 import io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure.WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +68,6 @@ class WebEndpointMappingGatewayServerMvcAutoConfigurationTest {
         routeProperties.setId("unknown-route-id");
         this.webEndpointMappingHandlerConfig.refresh(ofList(routeProperties), this.context, handlerFilterFunction -> {
         });
-
 
         Set<String> keys = ofSet("test-property-name");
         assertTrue(this.webEndpointMappingHandlerConfig.findWebEndpointMappingRouteProperties(keys).isEmpty());

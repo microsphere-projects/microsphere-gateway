@@ -17,7 +17,6 @@
 
 package io.microsphere.spring.cloud.gateway.commons.constants;
 
-
 import org.junit.jupiter.api.Test;
 
 import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstants.ALL_SERVICES;
