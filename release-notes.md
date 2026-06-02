@@ -80,4 +80,22 @@ No other changes.
 
 For more details, see the [Full Changelog](https://github.com/your-repo/compare/0.2.5...0.2.6).
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.5...0.2.6
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.5...0.2.6## v0.2.7
+
+# Release Notes: Version 0.2.7
+
+## Dependency Updates
+- **Bumped `microsphere-spring-cloud` to `0.2.14`.** ([436ff2b](https://github.com/microsphere-projects/commit/436ff2b))
+
+## Bug Fixes
+- **Removed duplicated line separators and trailing whitespace** in Java source files, improving code consistency and readability. ([3e7ba6c](https://github.com/microsphere-projects/commit/3e7ba6c))
+
+## Build and Workflow Enhancements
+- Routine merges between `main` and `release` branches to streamline workflow and maintain versioning integrity. ([8c3eb54](https://github.com/microsphere-projects/commit/8c3eb54), [7432600](https://github.com/microsphere-projects/commit/7432600), [dd17967](https://github.com/microsphere-projects/commit/dd17967))
+- Updated project version to prepare for the next patch. ([c9afa66](https://github.com/microsphere-projects/commit/c9afa66))
+
+---
+
+**Full Changelog:** [v0.2.6...v0.2.7](https://github.com/microsphere-projects/compare/v0.2.6...v0.2.7)
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.6...0.2.7
