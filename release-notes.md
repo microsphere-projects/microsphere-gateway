@@ -98,4 +98,19 @@ For more details, see the [Full Changelog](https://github.com/your-repo/compare/
 
 **Full Changelog:** [v0.2.6...v0.2.7](https://github.com/microsphere-projects/compare/v0.2.6...v0.2.7)
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.6...0.2.7
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.6...0.2.7## v0.2.8
+
+# Release Notes for Version 0.2.8
+
+## Dependency Updates
+- **Spring Cloud:** Upgraded Microsphere Spring Cloud to `0.2.15`.  
+- Updated `pom.xml` configuration.
+
+## Build and Workflow Enhancements
+- Merged `main` into `release` and `release` back into `main`.  
+- Bumped version to the next patch (`0.2.8`) after publishing `0.2.7`.  
+
+---  
+*No additional new features, bug fixes, or documentation changes in this release.*  
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.7...0.2.8
