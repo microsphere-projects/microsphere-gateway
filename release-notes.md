@@ -113,4 +113,16 @@ For more details, see the [Full Changelog](https://github.com/your-repo/compare/
 ---  
 *No additional new features, bug fixes, or documentation changes in this release.*  
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.7...0.2.8
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.7...0.2.8## v0.2.9
+
+# Release Notes for v0.2.9
+
+## Dependency Updates
+- Bumped Microsphere Spring Cloud to `0.2.16`. (*6a6e997*)
+
+## Build and Workflow Enhancements
+- Merged `main` branch into `release`. (*0f84da7, 7d563be*)
+- Merged `release` branch into `main` post-publishing. (*b4292df*)
+- Updated version to prepare for the next patch release. (*398c4fb*)
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.8...0.2.9
