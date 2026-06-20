@@ -43,9 +43,9 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnGatewayEnabled
 @ConditionalOnDiscoveryEnabled
 @ConditionalOnReactiveDiscoveryEnabled
-@ConditionalOnGatewayEnabled
 @ConditionalOnMicrosphereWebEndpointMappingEnabled
 @AutoConfigureAfter(
         value = {

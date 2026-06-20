@@ -21,7 +21,6 @@ import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
 import io.microsphere.spring.test.web.controller.TestController;
-import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -83,7 +82,6 @@ import static org.springframework.test.web.reactive.server.WebTestClient.bindToA
         webEnvironment = RANDOM_PORT
 )
 @EnableAutoConfiguration
-@EnableWebFluxExtension
 @TestMethodOrder(OrderAnnotation.class)
 class WebEndpointMappingGlobalFilterTest {
 

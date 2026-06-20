@@ -50,7 +50,6 @@ import static org.springframework.mock.web.server.MockServerWebExchange.from;
         webEnvironment = RANDOM_PORT
 )
 @EnableAutoConfiguration
-@EnableWebFluxExtension
 class WebEndpointMappingGatewayAutoConfigurationTest {
 
     @Autowired
