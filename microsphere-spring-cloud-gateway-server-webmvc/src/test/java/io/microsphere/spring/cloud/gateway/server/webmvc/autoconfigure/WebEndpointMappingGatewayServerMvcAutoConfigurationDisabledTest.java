@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
                 "microsphere.autoconfigure.exclude=org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration," +
                         "org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration," +
                         "org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration",
+                "microsphere.spring.boot.webmvc.enabled=false"
         }
 )
 @EnableAutoConfiguration
