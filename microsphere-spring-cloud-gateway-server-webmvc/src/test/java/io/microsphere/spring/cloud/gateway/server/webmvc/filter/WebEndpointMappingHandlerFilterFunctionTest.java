@@ -21,7 +21,6 @@ import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.client.service.registry.DefaultRegistration;
 import io.microsphere.spring.cloud.client.service.registry.event.RegistrationPreRegisteredEvent;
 import io.microsphere.spring.test.web.controller.TestController;
-import io.microsphere.spring.webmvc.annotation.EnableWebMvcExtension;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +86,6 @@ import static org.springframework.web.servlet.function.ServerRequest.create;
         webEnvironment = RANDOM_PORT
 )
 @EnableAutoConfiguration
-@EnableWebMvcExtension
 @DirtiesContext
 class WebEndpointMappingHandlerFilterFunctionTest {
 
