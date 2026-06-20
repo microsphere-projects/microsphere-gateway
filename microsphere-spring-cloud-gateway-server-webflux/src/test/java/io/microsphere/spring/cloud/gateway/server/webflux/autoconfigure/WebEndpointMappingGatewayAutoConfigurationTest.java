@@ -20,7 +20,6 @@ package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.DefaultGatewayFilterChain;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.NoOpGatewayFilter;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter;
-import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

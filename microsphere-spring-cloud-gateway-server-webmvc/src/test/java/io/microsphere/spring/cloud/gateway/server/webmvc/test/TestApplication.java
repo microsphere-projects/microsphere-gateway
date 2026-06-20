@@ -23,6 +23,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
  * Test Application
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
