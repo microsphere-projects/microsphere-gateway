@@ -125,4 +125,33 @@ For more details, see the [Full Changelog](https://github.com/your-repo/compare/
 - Merged `release` branch into `main` post-publishing. (*b4292df*)
 - Updated version to prepare for the next patch release. (*398c4fb*)
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.8...0.2.9
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.8...0.2.9## v0.2.10
+
+# Release Notes for v0.2.10
+
+## New Features
+- Introduced WebFlux availability condition in auto-configuration. [#34da1a7](https://github.com/user/repo/commit/34da1a7)
+- Added `ConditionalOnMicrosphereGatewayEnabled` tests for improved validation. [#444414d](https://github.com/user/repo/commit/444414d)
+
+## Bug Fixes
+- Disabled WebMVC in tests via configuration property. [#f84bf9f](https://github.com/user/repo/commit/f84bf9f)
+- Removed `EnableWebMvcExtension` and `EnableWebFluxExtension` from various test classes. [#911622a](https://github.com/user/repo/commit/911622a), [#b3a42f2](https://github.com/user/repo/commit/b3a42f2)
+- Removed unused imports in test classes. [#57b27c9](https://github.com/user/repo/commit/57b27c9)
+
+## Dependency Updates
+- Upgraded `microsphere-spring-cloud` to v0.2.19. [#8dc0d32](https://github.com/user/repo/commit/8dc0d32)
+- Previously bumped `microsphere-spring-cloud` to v0.2.18. [#c8508d1](https://github.com/user/repo/commit/c8508d1)
+
+## Test Improvements
+- Added `microsphere` web endpoint mapping tests for better coverage. [#74481c8](https://github.com/user/repo/commit/74481c8)
+
+## Build and Workflow Enhancements
+- Introduced logic to require Web MVC and order it after `WebMvcAutoConfiguration` in auto-configuration. [#bb7e415](https://github.com/user/repo/commit/bb7e415)
+- Reordered `@ConditionalOnGatewayEnabled` annotation for proper validation. [#e6356f1](https://github.com/user/repo/commit/e6356f1)
+
+## Other Changes
+- Added minor Javadoc improvements. [#3fae668](https://github.com/user/repo/commit/3fae668) 
+
+--- 
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.9...0.2.10
