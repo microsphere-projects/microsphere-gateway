@@ -1,0 +1,7 @@
+microsphere:
+  spring:
+    cloud:
+      features:
+        abstract:
+          microsphere-spring-cloud-gateway-commons:
+            - io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindListener

@@ -18,10 +18,12 @@
 package io.microsphere.spring.cloud.gateway.server.webmvc.context;
 
 import io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindListener;
+import io.microsphere.spring.context.ConfigurableApplicationContextInitializer;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
 import static io.microsphere.spring.cloud.gateway.commons.config.WebEndpointConfigurationPropertiesBindListener.BEAN_NAME;
@@ -35,10 +37,10 @@ import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.Gatewa
  * @see WebEndpointConfigurationPropertiesBindListener
  * @since 1.0.0
  */
-public class WebEndpointApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class WebEndpointApplicationContextInitializer extends ConfigurableApplicationContextInitializer {
 
     @Override
-    public void initialize(ConfigurableApplicationContext context) {
+    protected void initialize(ConfigurableApplicationContext context, ConfigurableEnvironment environment) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
         registerBeanDefinition(registry, BEAN_NAME,

@@ -1,0 +1,13 @@
+microsphere:
+  spring:
+    cloud:
+      features:
+        abstract:
+          microsphere-spring-cloud-gateway-server-webflux:
+            - io.microsphere.spring.cloud.gateway.server.webflux.handler.CachingFilteringWebHandler
+            - io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter
+            - io.microsphere.spring.cloud.gateway.server.webflux.event.DisabledHeartbeatEventRouteRefreshListenerInterceptor
+            - io.microsphere.spring.cloud.gateway.server.webflux.event.PropagatingRefreshRoutesEventApplicationListener
+        named:
+          microsphere-spring-cloud-gateway-server-webflux:
+            - WebEndpointApplicationContextInitializer=io.microsphere.spring.cloud.gateway.server.webflux.context.WebEndpointApplicationContextInitializer

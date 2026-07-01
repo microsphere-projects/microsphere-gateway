@@ -1,0 +1,7 @@
+microsphere:
+  spring:
+    cloud:
+      features:
+        named:
+          microsphere-spring-cloud-gateway-server-webmvc:
+            - WebEndpointApplicationContextInitializer=io.microsphere.spring.cloud.gateway.server.webmvc.context.WebEndpointApplicationContextInitializer
