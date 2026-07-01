@@ -17,10 +17,10 @@
 
 package io.microsphere.spring.cloud.gateway.commons.config;
 
+import io.microsphere.spring.boot.context.properties.bind.BindListener;
+import io.microsphere.spring.boot.context.properties.bind.ListenableBindHandlerAdapter;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBindHandlerAdvisor;
-import org.springframework.boot.context.properties.bind.AbstractBindHandler;
 import org.springframework.boot.context.properties.bind.BindContext;
-import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.context.EnvironmentAware;
@@ -34,43 +34,39 @@ import static io.microsphere.spring.cloud.gateway.commons.constants.RouteConstan
 import static io.microsphere.util.Assert.assertNotBlank;
 
 /**
- * The {@link ConfigurationPropertiesBindHandlerAdvisor} class for {@link WebEndpointConfig}
+ * The {@link BindListener} class for {@link WebEndpointConfig}
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see BindListener
+ * @see ListenableBindHandlerAdapter
  * @see ConfigurationPropertiesBindHandlerAdvisor
  * @see WebEndpointConfig
  * @since 1.0.0
  */
-public class WebEndpointConfigurationPropertiesBindHandlerAdvisor implements ConfigurationPropertiesBindHandlerAdvisor,
-        EnvironmentAware {
+public class WebEndpointConfigurationPropertiesBindListener implements BindListener, EnvironmentAware {
 
-    public static final String BEAN_NAME = "webEndpointConfigurationPropertiesBindHandlerAdvisor";
+    public static final String BEAN_NAME = "webEndpointConfigurationPropertiesBindListener";
 
     private final String gatewayRoutesPropertyNamePrefix;
 
     private Environment environment;
 
-    public WebEndpointConfigurationPropertiesBindHandlerAdvisor(String gatewayRoutesPropertyNamePrefix) {
+    public WebEndpointConfigurationPropertiesBindListener(String gatewayRoutesPropertyNamePrefix) {
         assertNotBlank(gatewayRoutesPropertyNamePrefix, () -> "The 'gatewayRoutesPropertyNamePrefix' must not be blank");
         this.gatewayRoutesPropertyNamePrefix = gatewayRoutesPropertyNamePrefix;
     }
 
     @Override
-    public BindHandler apply(BindHandler bindHandler) {
-        return new AbstractBindHandler(bindHandler) {
-            @Override
-            public void onFinish(ConfigurationPropertyName name, Bindable<?> target, BindContext context, Object result) {
-                String propertyName = name.toString();
-                if (propertyName.startsWith(gatewayRoutesPropertyNamePrefix) && propertyName.endsWith(METADATA_KEY) && result != null) {
-                    ConfigurationPropertyName webEndpointName = name.append(WEB_ENDPOINT_KEY);
-                    WebEndpointConfig webEndpointConfig = getWebEndpointConfig(environment, webEndpointName.toString());
-                    if (webEndpointConfig != null) {
-                        Map<String, Object> metadata = (Map<String, Object>) result;
-                        metadata.put(WEB_ENDPOINT_KEY, webEndpointConfig);
-                    }
-                }
+    public void onFinish(ConfigurationPropertyName name, Bindable<?> target, BindContext context, Object result) {
+        String propertyName = name.toString();
+        if (propertyName.startsWith(gatewayRoutesPropertyNamePrefix) && propertyName.endsWith(METADATA_KEY) && result != null) {
+            ConfigurationPropertyName webEndpointName = name.append(WEB_ENDPOINT_KEY);
+            WebEndpointConfig webEndpointConfig = getWebEndpointConfig(environment, webEndpointName.toString());
+            if (webEndpointConfig != null) {
+                Map<String, Object> metadata = (Map<String, Object>) result;
+                metadata.put(WEB_ENDPOINT_KEY, webEndpointConfig);
             }
-        };
+        }
     }
 
     @Override

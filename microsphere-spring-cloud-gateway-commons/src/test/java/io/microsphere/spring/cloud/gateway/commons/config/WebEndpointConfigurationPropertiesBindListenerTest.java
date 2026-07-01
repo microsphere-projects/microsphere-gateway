@@ -19,54 +19,46 @@ package io.microsphere.spring.cloud.gateway.commons.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.context.properties.bind.BindHandler;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static io.microsphere.spring.boot.context.properties.bind.util.BindUtils.bind;
 import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtils.getWebEndpointConfig;
 import static io.microsphere.spring.cloud.gateway.commons.config.ConfigUtilsTest.createEnvironment;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.boot.context.properties.bind.BindHandler.DEFAULT;
-import static org.springframework.boot.context.properties.bind.Bindable.of;
-import static org.springframework.boot.context.properties.bind.Binder.get;
 
 /**
- * {@link WebEndpointConfigurationPropertiesBindHandlerAdvisor} Test
+ * {@link WebEndpointConfigurationPropertiesBindListener} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see WebEndpointConfigurationPropertiesBindHandlerAdvisor
+ * @see WebEndpointConfigurationPropertiesBindListener
  * @since 1.0.0
  */
-class WebEndpointConfigurationPropertiesBindHandlerAdvisorTest {
+class WebEndpointConfigurationPropertiesBindListenerTest {
 
     private Environment environment;
 
-    private WebEndpointConfigurationPropertiesBindHandlerAdvisor advisor;
+    private WebEndpointConfigurationPropertiesBindListener bindListener;
 
     @BeforeEach
     void setUp() throws IOException {
         this.environment = createEnvironment();
 
-        this.advisor = new WebEndpointConfigurationPropertiesBindHandlerAdvisor("spring.cloud.gateway.routes");
-        this.advisor.setEnvironment(environment);
+        this.bindListener = new WebEndpointConfigurationPropertiesBindListener("spring.cloud.gateway.routes");
+        this.bindListener.setEnvironment(environment);
     }
 
     @Test
     void testApply() {
-        BindHandler bindHandler = this.advisor.apply(DEFAULT);
-        Binder binder = get(environment, bindHandler);
-        Bindable<LinkedHashMap> bindable = of(LinkedHashMap.class);
-        Map<String, Object> result = binder.bind("spring.cloud.gateway.routes[0].metadata", bindable).get();
+        Map<String, Object> result = bind(this.environment, "spring.cloud.gateway.routes[0].metadata", LinkedHashMap.class, this.bindListener);
         WebEndpointConfig config = getWebEndpointConfig(result);
         assertNotNull(config);
 
-        binder.bind("spring.cloud.gateway.routes[1].metadata", bindable);
-        binder.bind("spring.cloud.gateway.routes[2].metadata", bindable);
-        binder.bind("spring.cloud", bindable);
+        bind(this.environment, "spring.cloud.gateway.routes[1].metadata", LinkedHashMap.class, this.bindListener);
+        bind(this.environment, "spring.cloud.gateway.routes[2].metadata", LinkedHashMap.class, this.bindListener);
+        bind(this.environment, "spring.cloud", LinkedHashMap.class, this.bindListener);
     }
 }
