@@ -16,18 +16,20 @@
  */
 package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
-import io.microsphere.spring.boot.webmvc.autoconfigure.condition.ConditionalOnWebMvcAvailable;
+import io.microsphere.spring.boot.webmvc.autoconfigure.WebMvcAutoConfiguration;
+import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
 import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
+import io.microsphere.spring.cloud.gateway.server.webmvc.annotation.ConditionalOnGatewayServerMvcAvailable;
 import io.microsphere.spring.cloud.gateway.server.webmvc.annotation.ConditionalOnGatewayServerMvcEnabled;
 import io.microsphere.spring.cloud.gateway.server.webmvc.filter.WebEndpointMappingHandlerFilterFunction;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration;
 import org.springframework.cloud.client.ConditionalOnBlockingDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.cloud.gateway.server.mvc.GatewayServerMvcAutoConfiguration;
 import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
@@ -64,21 +66,25 @@ import static java.util.stream.Collectors.toUnmodifiableList;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnGatewayServerMvcAvailable
 @ConditionalOnDiscoveryEnabled
 @ConditionalOnBlockingDiscoveryEnabled
-@ConditionalOnGatewayServerMvcEnabled
-@ConditionalOnWebMvcAvailable
 @ConditionalOnMicrosphereWebEndpointMappingEnabled
+@ConditionalOnClass(name = {
+        "org.springframework.cloud.client.discovery.DiscoveryClient",               // Spring Cloud Commons API
+        "org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory"  // Spring Cloud LoadBalancer API
+})
 @AutoConfigureAfter(
         value = {
-                GatewayServerMvcAutoConfiguration.class,
-                CompositeDiscoveryClientAutoConfiguration.class,
+                WebMvcAutoConfiguration.class,
+                ReactiveDiscoveryClientAutoConfiguration.class,
                 ConfigurationPropertiesRebinderAutoConfiguration.class
         },
         name = {
-                "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration",
-                "io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration",
-                "io.microsphere.spring.boot.webmvc.autoconfigure.WebMvcAutoConfiguration"
+                "org.springframework.cloud.gateway.server.mvc.GatewayServerMvcAutoConfiguration",
+                "org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration",
+                "org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration",
+                "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration"
         }
 )
 @Import(WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig.class)

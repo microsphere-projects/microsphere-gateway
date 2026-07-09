@@ -16,10 +16,13 @@
  */
 package io.microsphere.spring.cloud.gateway.server.webmvc.constants;
 
+import io.microsphere.annotation.ConfigurationProperty;
 import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
 
+import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.DEFAULT_MICROSPHERE_GATEWAY_ENABLED;
 import static org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties.PREFIX;
 
 /**
@@ -31,10 +34,13 @@ import static org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProp
 public interface GatewayPropertyConstants {
 
     /**
-     * The property name of Gateway enabled.
-     *
-     * @see GatewayMvcProperties#PREFIX
+     * The property name of enabling Spring Cloud Gateway Server MVC: "spring.cloud.gateway.server.webmvc.enabled"
      */
+    @ConfigurationProperty(
+            type = boolean.class,
+            defaultValue = DEFAULT_MICROSPHERE_GATEWAY_ENABLED,
+            source = APPLICATION_SOURCE
+    )
     String GATEWAY_ENABLED_PROPERTY_NAME = PREFIX + DOT + ENABLED_PROPERTY_NAME;
 
     /**
