@@ -16,17 +16,17 @@
  */
 package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 
+import io.microsphere.spring.boot.webflux.autoconfigure.WebFluxAutoConfiguration;
 import io.microsphere.spring.boot.webflux.autoconfigure.condition.ConditionalOnWebFluxAvailable;
 import io.microsphere.spring.cloud.client.discovery.ReactiveDiscoveryClientAdapter;
 import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
-import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayEnabled;
+import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayAvailable;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
-import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
@@ -40,11 +40,10 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGlobalFilter
- * @see GatewayAutoConfiguration
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnGatewayEnabled
+@ConditionalOnGatewayAvailable
 @ConditionalOnDiscoveryEnabled
 @ConditionalOnReactiveDiscoveryEnabled
 @ConditionalOnMicrosphereWebEndpointMappingEnabled
@@ -52,12 +51,13 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
 @AutoConfigureAfter(
         value = {
                 GatewayAutoConfiguration.class,
+                WebFluxAutoConfiguration.class,
                 ReactiveDiscoveryClientAutoConfiguration.class
         },
         name = {
+                "org.springframework.cloud.gateway.config.GatewayAutoConfiguration",
                 "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration",
-                "org.springframework.cloud.client.discovery.composite.reactive.ReactiveCompositeDiscoveryClientAutoConfiguration",
-                "io.microsphere.spring.boot.webflux.autoconfigure.WebFluxAutoConfiguration"
+                "org.springframework.cloud.client.discovery.composite.reactive.ReactiveCompositeDiscoveryClientAutoConfiguration"
         }
 )
 public class WebEndpointMappingGatewayAutoConfiguration {

@@ -36,7 +36,7 @@ import static org.springframework.mock.http.server.reactive.MockServerHttpReques
 import static org.springframework.mock.web.server.MockServerWebExchange.from;
 
 /**
- * {@link WebEndpointMappingGatewayAutoConfiguration} Test
+ * {@link WebEndpointMappingGatewayAutoConfiguration} Integration Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGatewayAutoConfiguration
@@ -44,12 +44,12 @@ import static org.springframework.mock.web.server.MockServerWebExchange.from;
  */
 @SpringBootTest(
         classes = {
-                WebEndpointMappingGatewayAutoConfigurationTest.class,
+                WebEndpointMappingGatewayAutoConfigurationIntegrationTest.class,
         },
         webEnvironment = RANDOM_PORT
 )
 @EnableAutoConfiguration
-class WebEndpointMappingGatewayAutoConfigurationTest {
+class WebEndpointMappingGatewayAutoConfigurationIntegrationTest {
 
     @Autowired
     private WebEndpointMappingGlobalFilter webEndpointMappingGlobalFilter;

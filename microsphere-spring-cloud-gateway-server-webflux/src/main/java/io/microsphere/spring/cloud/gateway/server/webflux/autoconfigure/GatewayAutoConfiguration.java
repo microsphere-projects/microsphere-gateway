@@ -17,7 +17,7 @@
 package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereGatewayEnabled;
-import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayEnabled;
+import io.microsphere.spring.cloud.gateway.server.webflux.annotation.ConditionalOnGatewayAvailable;
 import io.microsphere.spring.cloud.gateway.server.webflux.event.DisabledHeartbeatEventRouteRefreshListenerInterceptor;
 import io.microsphere.spring.cloud.gateway.server.webflux.event.PropagatingRefreshRoutesEventApplicationListener;
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter;
@@ -36,10 +36,12 @@ import org.springframework.context.annotation.Import;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnGatewayEnabled
+@ConditionalOnGatewayAvailable
 @ConditionalOnMicrosphereGatewayEnabled
-@AutoConfigureAfter(org.springframework.cloud.gateway.config.GatewayAutoConfiguration.class)
 @EnableEventExtension
+@AutoConfigureAfter(name = {
+        "org.springframework.cloud.gateway.config.GatewayAutoConfiguration"
+})
 @Import(value = {
         DisabledHeartbeatEventRouteRefreshListenerInterceptor.class,
         PropagatingRefreshRoutesEventApplicationListener.class,

@@ -18,7 +18,6 @@ package io.microsphere.spring.cloud.gateway.server.webflux.constants;
 
 import io.microsphere.annotation.ConfigurationProperty;
 import org.springframework.cloud.gateway.config.GatewayProperties;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
@@ -51,9 +50,5 @@ public interface GatewayPropertyConstants {
      *
      * @see GatewayProperties#getRoutes()
      */
-    @ConfigurationProperty(
-            type = RouteDefinition.class,
-            source = APPLICATION_SOURCE
-    )
     String GATEWAY_ROUTES_PROPERTY_NAME_PREFIX = PREFIX + DOT + "routes";
 }
