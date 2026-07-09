@@ -19,7 +19,6 @@ package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 
 
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
-import io.microsphere.spring.boot.test.WebAutoConfigurationTest;
 import io.microsphere.spring.cloud.gateway.server.webflux.event.DisabledHeartbeatEventRouteRefreshListenerInterceptor;
 import io.microsphere.spring.cloud.gateway.server.webflux.event.PropagatingRefreshRoutesEventApplicationListener;
 import io.microsphere.spring.cloud.gateway.server.webflux.handler.FilteringWebHandlerBeanDefinitionRegistryPostProcessor;
