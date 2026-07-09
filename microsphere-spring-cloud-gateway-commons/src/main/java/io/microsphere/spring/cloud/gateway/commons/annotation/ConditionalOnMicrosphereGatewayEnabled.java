@@ -25,7 +25,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.DEFAULT_MICROSPHERE_GATEWAY_ENABLED;
 import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.MICROSPHERE_GATEWAY_ENABLED_PROPERTY_NAME;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -44,7 +43,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 @Documented
-@ConditionalOnProperty(name = MICROSPHERE_GATEWAY_ENABLED_PROPERTY_NAME,
-        havingValue = DEFAULT_MICROSPHERE_GATEWAY_ENABLED, matchIfMissing = true)
+@ConditionalOnProperty(name = MICROSPHERE_GATEWAY_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 public @interface ConditionalOnMicrosphereGatewayEnabled {
 }

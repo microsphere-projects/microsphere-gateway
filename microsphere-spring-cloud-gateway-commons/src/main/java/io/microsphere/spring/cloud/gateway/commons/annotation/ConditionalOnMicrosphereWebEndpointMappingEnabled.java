@@ -18,6 +18,7 @@
 package io.microsphere.spring.cloud.gateway.commons.annotation;
 
 import io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants;
+import io.microsphere.spring.web.metadata.WebEndpointMapping;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 
@@ -25,7 +26,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.DEFAULT_MICROSPHERE_GATEWAY_ENABLED;
 import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.MICROSPHERE_WEB_ENDPOINT_MAPPING_ENABLED_PROPERTY_NAME;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -33,7 +33,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The conditional annotation meta-annotates {@link ConditionalOnProperty @ConditionalOnProperty} for
- * Microsphere Spring Cloud Gateway enabled.
+ * Microsphere Spring Cloud Gateway's {@link WebEndpointMapping} enabled.
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see Conditional
@@ -45,7 +45,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Documented
 @ConditionalOnMicrosphereGatewayEnabled
-@ConditionalOnProperty(name = MICROSPHERE_WEB_ENDPOINT_MAPPING_ENABLED_PROPERTY_NAME,
-        havingValue = DEFAULT_MICROSPHERE_GATEWAY_ENABLED, matchIfMissing = true)
+@ConditionalOnProperty(name = MICROSPHERE_WEB_ENDPOINT_MAPPING_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 public @interface ConditionalOnMicrosphereWebEndpointMappingEnabled {
 }

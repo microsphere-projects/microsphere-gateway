@@ -16,10 +16,14 @@
  */
 package io.microsphere.spring.cloud.gateway.server.webflux.constants;
 
+import io.microsphere.annotation.ConfigurationProperty;
 import org.springframework.cloud.gateway.config.GatewayProperties;
+import org.springframework.cloud.gateway.route.RouteDefinition;
 
+import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.spring.cloud.gateway.commons.constants.CommonsPropertyConstants.DEFAULT_MICROSPHERE_GATEWAY_ENABLED;
 import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 
 /**
@@ -31,10 +35,15 @@ import static org.springframework.cloud.gateway.config.GatewayProperties.PREFIX;
 public interface GatewayPropertyConstants {
 
     /**
-     * The property name of Gateway enabled.
+     * The property name of enabling Spring Cloud Server WebFlux Gateway: "spring.cloud.gateway.server.webflux.enabled"
      *
      * @see GatewayProperties#PREFIX
      */
+    @ConfigurationProperty(
+            type = boolean.class,
+            defaultValue = DEFAULT_MICROSPHERE_GATEWAY_ENABLED,
+            source = APPLICATION_SOURCE
+    )
     String GATEWAY_ENABLED_PROPERTY_NAME = PREFIX + DOT + ENABLED_PROPERTY_NAME;
 
     /**
@@ -42,5 +51,9 @@ public interface GatewayPropertyConstants {
      *
      * @see GatewayProperties#getRoutes()
      */
+    @ConfigurationProperty(
+            type = RouteDefinition.class,
+            source = APPLICATION_SOURCE
+    )
     String GATEWAY_ROUTES_PROPERTY_NAME_PREFIX = PREFIX + DOT + "routes";
 }
