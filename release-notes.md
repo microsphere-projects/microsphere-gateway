@@ -178,4 +178,17 @@ For more details, see the [Full Changelog](https://github.com/your-repo/compare/
 ### Other Changes
 - Bumped version to the next patch after publishing `0.2.11`. (`f20486f`)  
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.11...0.2.12
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.11...0.2.12## v0.2.13
+
+# Release Notes - Version 0.2.13
+
+### Dependency Updates
+- **microsphere-spring-cloud**: Bumped to version `0.2.21`. ([0973c5c](#))
+
+### Build and Workflow Enhancements
+- Merged `main` into `release`. ([456358e](#), [074171e](#))
+- Prepared for next development cycle by bumping version post `0.2.12` publication. ([ef505de](#))
+
+---
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.12...0.2.13
