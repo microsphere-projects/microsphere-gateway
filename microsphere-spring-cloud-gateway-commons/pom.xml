@@ -18,19 +18,20 @@
 
     <dependencies>
 
-        <!-- Bean Validation API -->
+        <!-- Microsphere Annotation Processor -->
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-annotation-processor</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- Microsphere -->
+        <!-- Microsphere Spring Cloud Commons -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-cloud-commons</artifactId>
         </dependency>
 
+        <!-- Microsphere Spring Web -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-web</artifactId>
@@ -76,6 +77,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Bean Validation API -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,10 +91,10 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Microsphere Spring Testing -->
+        <!-- Microsphere Spring Boot Testing -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-spring-test</artifactId>
+            <artifactId>microsphere-spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
 

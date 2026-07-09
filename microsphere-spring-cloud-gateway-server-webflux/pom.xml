@@ -18,16 +18,38 @@
 
     <dependencies>
 
-        <!-- Microsphere -->
+        <!-- Microsphere Annotation Processor -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-annotation-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Microsphere Spring Cloud Gateway Commons -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-cloud-gateway-commons</artifactId>
             <version>${revision}</version>
         </dependency>
 
+        <!-- Microsphere Spring Boot WebFlux -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-spring-webflux</artifactId>
+            <artifactId>microsphere-spring-boot-webflux</artifactId>
+        </dependency>
+
+        <!-- Spring Cloud Commons-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Cloud LoadBalancer-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Spring Boot -->
@@ -55,31 +77,22 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Cloud Commons-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-commons</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Spring Cloud LoadBalancer-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-loadbalancer</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- Microsphere Spring Testing -->
+        <!-- Microsphere Spring Boot Testing -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-spring-test</artifactId>
+            <artifactId>microsphere-spring-boot-test</artifactId>
         </dependency>
 
     </dependencies>
