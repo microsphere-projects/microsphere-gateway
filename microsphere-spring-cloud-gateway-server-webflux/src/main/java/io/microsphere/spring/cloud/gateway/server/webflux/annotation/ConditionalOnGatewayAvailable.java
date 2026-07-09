@@ -17,6 +17,7 @@
 
 package io.microsphere.spring.cloud.gateway.server.webflux.annotation;
 
+import io.microsphere.spring.boot.webflux.autoconfigure.condition.ConditionalOnWebFluxAvailable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -59,6 +60,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Documented
 @ConditionalOnGatewayEnabled
+@ConditionalOnWebFluxAvailable
 @ConditionalOnClass(name = {
         "org.springframework.cloud.gateway.config.GatewayProperties"    // Spring Cloud Gateway Server WebFlux API
 })

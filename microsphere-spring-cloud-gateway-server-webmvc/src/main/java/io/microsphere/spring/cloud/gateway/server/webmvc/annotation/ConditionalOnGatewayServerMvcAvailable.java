@@ -42,10 +42,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 @Documented
+@ConditionalOnGatewayServerMvcEnabled
+@ConditionalOnWebMvcAvailable
 @ConditionalOnClass(name = {
         "org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties"       // Spring Cloud Gateway Server MVC API
 })
-@ConditionalOnWebMvcAvailable
-@ConditionalOnGatewayServerMvcEnabled
 public @interface ConditionalOnGatewayServerMvcAvailable {
 }

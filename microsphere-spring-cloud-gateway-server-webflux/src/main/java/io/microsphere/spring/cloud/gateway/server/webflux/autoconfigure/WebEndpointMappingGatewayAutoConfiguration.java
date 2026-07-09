@@ -47,7 +47,6 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
 @ConditionalOnDiscoveryEnabled
 @ConditionalOnReactiveDiscoveryEnabled
 @ConditionalOnMicrosphereWebEndpointMappingEnabled
-@ConditionalOnWebFluxAvailable
 @AutoConfigureAfter(
         value = {
                 GatewayAutoConfiguration.class,
