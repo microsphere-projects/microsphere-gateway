@@ -40,7 +40,7 @@ import java.util.Set;
                 GatewayAutoConfigurationTest.class
         }
 )
-class GatewayAutoConfigurationTest extends WebAutoConfigurationTest<GatewayAutoConfiguration> {
+class GatewayAutoConfigurationTest extends AutoConfigurationTest<GatewayAutoConfiguration> {
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
