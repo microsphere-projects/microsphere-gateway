@@ -19,45 +19,41 @@ package io.microsphere.spring.cloud.gateway.server.webflux.autoconfigure;
 
 
 import io.microsphere.spring.boot.test.ReactiveWebAutoConfigurationTest;
-import io.microsphere.spring.cloud.gateway.server.webflux.event.DisabledHeartbeatEventRouteRefreshListenerInterceptor;
-import io.microsphere.spring.cloud.gateway.server.webflux.event.PropagatingRefreshRoutesEventApplicationListener;
-import io.microsphere.spring.cloud.gateway.server.webflux.handler.FilteringWebHandlerBeanDefinitionRegistryPostProcessor;
 import io.microsphere.spring.web.method.support.HandlerMethodInterceptor;
 import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.DispatcherHandler;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import java.util.Set;
 
 /**
- * {@link GatewayAutoConfiguration} Test
+ * {@link WebEndpointMappingGatewayAutoConfiguration} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see GatewayAutoConfiguration
+ * @see WebEndpointMappingGatewayAutoConfiguration
  * @since 1.0.0
  */
 @SpringBootTest(
         classes = {
-                GatewayAutoConfigurationTest.class
+                WebEndpointMappingGatewayAutoConfigurationTest.class
         }
 )
-class GatewayAutoConfigurationTest extends ReactiveWebAutoConfigurationTest<GatewayAutoConfiguration> {
+class WebEndpointMappingGatewayAutoConfigurationTest extends ReactiveWebAutoConfigurationTest<WebEndpointMappingGatewayAutoConfiguration> {
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
-        autoConfiguredClasses.add(DisabledHeartbeatEventRouteRefreshListenerInterceptor.class);
-        autoConfiguredClasses.add(PropagatingRefreshRoutesEventApplicationListener.class);
-        autoConfiguredClasses.add(FilteringWebHandlerBeanDefinitionRegistryPostProcessor.class);
     }
 
     @Override
     protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
         globalDisabledPropertyValues.add("spring.cloud.gateway.server.webflux.enabled=false");
-        globalDisabledPropertyValues.add("microsphere.spring.cloud.gateway.enabled=false");
         globalDisabledPropertyValues.add("microsphere.spring.boot.webflux.enabled=false");
+        globalDisabledPropertyValues.add("spring.cloud.discovery.reactive.enabled=false");
+        globalDisabledPropertyValues.add("microsphere.spring.cloud.gateway.enabled=false");
+        globalDisabledPropertyValues.add("microsphere.spring.cloud.web-endpoint-mapping.enabled=false");
     }
 
     @Override
@@ -67,6 +63,6 @@ class GatewayAutoConfigurationTest extends ReactiveWebAutoConfigurationTest<Gate
         globalMissingClasses.add(DispatcherHandler.class);
         globalMissingClasses.add(HandlerMethodInterceptor.class);
         globalMissingClasses.add(EnableWebFluxExtension.class);
-        globalMissingClasses.add(GatewayProperties.class);
+        globalMissingClasses.add(WebClient.class);
     }
 }
