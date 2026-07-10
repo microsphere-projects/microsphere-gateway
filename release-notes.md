@@ -191,4 +191,33 @@ For more details, see the [Full Changelog](https://github.com/your-repo/compare/
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.12...0.2.13
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.12...0.2.13## v0.2.14
+
+# Release Notes for Version 0.2.14
+
+## Improvements
+
+### Bug Fixes
+- **Gateway Configuration**:
+  - Refined MVC gateway availability conditions. ([b616720](https://github.com/link-to-commit))
+  - Added WebFlux-specific checks to gateway conditions for improved compatibility. ([3272ca9](https://github.com/link-to-commit), [b869149](https://github.com/link-to-commit))
+  - Disabled `GatewayAutoConfigurationTest`. ([0fb75e4](https://github.com/link-to-commit))
+  - Removed unused imports and redundant dependencies. ([1d37f94](https://github.com/link-to-commit), [964faf8](https://github.com/link-to-commit))
+
+### Test Improvements
+- Aligned WebFlux gateway auto-config tests with other modules. ([dc9a3d7](https://github.com/link-to-commit), [6024a25](https://github.com/link-to-commit))
+- Used a shared test base for gateway auto-configuration scenarios. ([5676201](https://github.com/link-to-commit))
+- Removed obsolete test file `WebEndpointMappingGatewayAutoConfigurationTest.java`. ([076434d](https://github.com/link-to-commit))
+
+### Dependency Updates
+- Upgraded Microsphere Spring Cloud to `0.2.22`. ([bf9fc72](https://github.com/link-to-commit))
+
+### Build and Workflow Enhancements
+- Various merges from `main` to ensure release branch alignment. ([Multiple `chore: merge main` commits](https://github.com/link-to-commits))
+- Bumped version to prepare for next patch release cycle. ([04fc744](https://github.com/link-to-commit))
+
+---
+
+For a complete list of changes, refer to the [Full Changelog](https://github.com/link-to-full-changelog).
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.13...0.2.14
