@@ -22,6 +22,8 @@ import io.microsphere.spring.boot.test.ReactiveWebAutoConfigurationTest;
 import io.microsphere.spring.web.method.support.HandlerMethodInterceptor;
 import io.microsphere.spring.webflux.annotation.EnableWebFluxExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.DispatcherHandler;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -64,5 +66,7 @@ class WebEndpointMappingGatewayAutoConfigurationTest extends ReactiveWebAutoConf
         globalMissingClasses.add(HandlerMethodInterceptor.class);
         globalMissingClasses.add(EnableWebFluxExtension.class);
         globalMissingClasses.add(WebClient.class);
+        globalMissingClasses.add(ReactiveDiscoveryClient.class);
+        globalMissingClasses.add(LoadBalancerClientFactory.class);
     }
 }

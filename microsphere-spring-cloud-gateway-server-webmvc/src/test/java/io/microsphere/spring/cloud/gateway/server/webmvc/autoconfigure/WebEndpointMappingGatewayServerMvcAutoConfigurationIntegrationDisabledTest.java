@@ -27,7 +27,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * {@link WebEndpointMappingGatewayServerMvcAutoConfiguration} Test on disabled
+ * {@link WebEndpointMappingGatewayServerMvcAutoConfiguration} Integration Test on disabled
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebEndpointMappingGatewayServerMvcAutoConfiguration
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 @SpringBootTest(
         classes = {
-                WebEndpointMappingGatewayServerMvcAutoConfigurationDisabledTest.class
+                WebEndpointMappingGatewayServerMvcAutoConfigurationIntegrationDisabledTest.class
         },
         properties = {
                 "microsphere.autoconfigure.exclude=org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration," +
@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 )
 @EnableAutoConfiguration
 @DirtiesContext
-class WebEndpointMappingGatewayServerMvcAutoConfigurationDisabledTest {
+class WebEndpointMappingGatewayServerMvcAutoConfigurationIntegrationDisabledTest {
 
     @Autowired(required = false)
     private WebEndpointMappingHandlerConfig webEndpointMappingHandlerConfig;

@@ -24,6 +24,7 @@ import io.microsphere.spring.cloud.gateway.server.webflux.annotation.Conditional
 import io.microsphere.spring.cloud.gateway.server.webflux.filter.WebEndpointMappingGlobalFilter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
 import org.springframework.cloud.gateway.config.GatewayProperties;
@@ -46,6 +47,10 @@ import static org.springframework.boot.autoconfigure.condition.SearchStrategy.CU
 @ConditionalOnDiscoveryEnabled
 @ConditionalOnReactiveDiscoveryEnabled
 @ConditionalOnMicrosphereWebEndpointMappingEnabled
+@ConditionalOnClass(name = {
+        "org.springframework.cloud.client.discovery.ReactiveDiscoveryClient",       // Spring Cloud Commons API
+        "org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory"  // Spring Cloud LoadBalancer API
+})
 @AutoConfigureAfter(
         value = {
                 GatewayAutoConfiguration.class,

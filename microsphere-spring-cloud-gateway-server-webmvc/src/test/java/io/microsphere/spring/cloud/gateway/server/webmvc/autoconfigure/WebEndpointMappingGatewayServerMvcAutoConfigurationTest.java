@@ -17,23 +17,17 @@
 
 package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
-import io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure.WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+
+import io.microsphere.spring.boot.test.WebAutoConfigurationTest;
+import io.microsphere.spring.web.method.support.HandlerMethodInterceptor;
+import io.microsphere.spring.webmvc.annotation.EnableWebMvcExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.DispatcherServlet;
 
 import java.util.Set;
-
-import static io.microsphere.collection.Lists.ofList;
-import static io.microsphere.collection.Sets.ofSet;
-import static io.microsphere.spring.cloud.gateway.server.webmvc.constants.GatewayPropertyConstants.GATEWAY_ROUTES_PROPERTY_NAME_PREFIX;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@link WebEndpointMappingGatewayServerMvcAutoConfiguration} Test
@@ -45,38 +39,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(
         classes = {
                 WebEndpointMappingGatewayServerMvcAutoConfigurationTest.class
-        },
-        properties = {
-                "spring.profiles.active=gateway"
         }
 )
-@EnableAutoConfiguration
-@DirtiesContext
-class WebEndpointMappingGatewayServerMvcAutoConfigurationTest {
+class WebEndpointMappingGatewayServerMvcAutoConfigurationTest extends WebAutoConfigurationTest<WebEndpointMappingGatewayServerMvcAutoConfiguration> {
 
-    @Autowired
-    private WebEndpointMappingHandlerConfig webEndpointMappingHandlerConfig;
+    @Override
+    protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
+    }
 
-    @Autowired
-    private ApplicationContext context;
+    @Override
+    protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
+        globalDisabledPropertyValues.add("spring.cloud.gateway.server.webmvc.enabled=false");
+        globalDisabledPropertyValues.add("microsphere.spring.boot.webmvc.enabled=false");
+        globalDisabledPropertyValues.add("spring.cloud.discovery.enabled=false");
+        globalDisabledPropertyValues.add("microsphere.spring.cloud.gateway.enabled=false");
+        globalDisabledPropertyValues.add("microsphere.spring.cloud.web-endpoint-mapping.enabled=false");
+    }
 
-    @Test
-    void test() {
-        assertNotNull(webEndpointMappingHandlerConfig);
-
-        RouteProperties routeProperties = new RouteProperties();
-        routeProperties.setId("unknown-route-id");
-        this.webEndpointMappingHandlerConfig.refresh(ofList(routeProperties), this.context, handlerFilterFunction -> {
-        });
-
-        Set<String> keys = ofSet("test-property-name");
-        assertTrue(this.webEndpointMappingHandlerConfig.findWebEndpointMappingRouteProperties(keys).isEmpty());
-
-        keys = ofSet(GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].id",
-                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[0].metadata",
-                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[1].id",
-                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[2].id",
-                GATEWAY_ROUTES_PROPERTY_NAME_PREFIX + "[2].metadata");
-        assertFalse(this.webEndpointMappingHandlerConfig.findWebEndpointMappingRouteProperties(keys).isEmpty());
+    @Override
+    protected void configureGlobalMissingClasses(Set<Class<?>> globalMissingClasses) {
+        globalMissingClasses.add(HandlerMethod.class);
+        globalMissingClasses.add(DispatcherServlet.class);
+        globalMissingClasses.add(HandlerMethodInterceptor.class);
+        globalMissingClasses.add(EnableWebMvcExtension.class);
+        globalMissingClasses.add(DiscoveryClient.class);
+        globalMissingClasses.add(LoadBalancerClientFactory.class);
     }
 }

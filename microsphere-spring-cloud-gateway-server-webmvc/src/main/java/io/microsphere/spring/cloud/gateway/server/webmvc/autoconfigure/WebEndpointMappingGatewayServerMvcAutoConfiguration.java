@@ -17,7 +17,7 @@
 package io.microsphere.spring.cloud.gateway.server.webmvc.autoconfigure;
 
 import io.microsphere.spring.boot.webmvc.autoconfigure.WebMvcAutoConfiguration;
-import io.microsphere.spring.cloud.client.discovery.autoconfigure.ReactiveDiscoveryClientAutoConfiguration;
+import io.microsphere.spring.cloud.client.discovery.autoconfigure.DiscoveryClientAutoConfiguration;
 import io.microsphere.spring.cloud.client.event.ServiceInstancesChangedEvent;
 import io.microsphere.spring.cloud.gateway.commons.annotation.ConditionalOnMicrosphereWebEndpointMappingEnabled;
 import io.microsphere.spring.cloud.gateway.server.webmvc.annotation.ConditionalOnGatewayServerMvcAvailable;
@@ -26,7 +26,6 @@ import io.microsphere.spring.cloud.gateway.server.webmvc.filter.WebEndpointMappi
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration;
 import org.springframework.cloud.client.ConditionalOnBlockingDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -77,14 +76,13 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 @AutoConfigureAfter(
         value = {
                 WebMvcAutoConfiguration.class,
-                ReactiveDiscoveryClientAutoConfiguration.class,
-                ConfigurationPropertiesRebinderAutoConfiguration.class
+                DiscoveryClientAutoConfiguration.class
         },
         name = {
+                "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration",
                 "org.springframework.cloud.gateway.server.mvc.GatewayServerMvcAutoConfiguration",
-                "org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration",
                 "org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration",
-                "org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration"
+                "org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration",
         }
 )
 @Import(WebEndpointMappingGatewayServerMvcAutoConfiguration.WebEndpointMappingHandlerConfig.class)
