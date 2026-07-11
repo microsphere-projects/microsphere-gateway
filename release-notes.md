@@ -220,4 +220,31 @@ For more details, see the [Full Changelog](https://github.com/your-repo/compare/
 
 For a complete list of changes, refer to the [Full Changelog](https://github.com/link-to-full-changelog).
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.13...0.2.14
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.13...0.2.14## v0.2.15
+
+# Release Notes - Version 0.2.15
+
+## New Features
+- Refine MVC auto-configuration and split related tests. ([b948cc9](#))
+- Add auto-configuration test coverage for `WebEndpointMapping`. ([4b473fe](#))
+
+## Bug Fixes
+- Guard WebFlux auto-configuration conditionally based on classpath. ([725c78d](#))
+- Re-enable WebFlux Gateway auto-configuration tests. ([c45fb0f](#))
+
+## Dependency Updates
+- Bump `microsphere-spring-cloud` to version 0.2.23. ([53f0c17](#))
+- Bump parent project version to 0.2.23 and rename project. ([2cd9138](#))
+
+## Test Improvements
+- Use `starter-test` in WebMVC test scope for uniformity. ([e864835](#))
+
+## Build and Workflow Enhancements
+- Refine module dependencies for `WebMVC`, `WebFlux`, and `commons`. ([6155322](#), [299a100](#), [c8681b1](#))
+- Various `merge main` and `merge release` chores. ([353f3f4](#), [6620c81](#), [f79e6a7](#), [d330d28](#), [1e4b2e5](#))
+
+---
+
+**Note:** These changes aim to enhance module configuration, testing, and maintainability across the project.
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.14...0.2.15
