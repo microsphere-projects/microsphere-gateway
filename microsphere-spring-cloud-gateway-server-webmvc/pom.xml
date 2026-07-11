@@ -32,6 +32,13 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- Microsphere Spring Cloud Commons -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-spring-cloud-commons</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Microsphere Spring Boot WebMVC -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
