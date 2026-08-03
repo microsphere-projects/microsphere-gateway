@@ -228,4 +228,16 @@ Full Changelog: [0.1.14...0.1.15](#)
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.1.15...0.1.16
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.1.15...0.1.16## v0.1.17
+
+_Release notes generation failed. Raw commits since 0.1.16:_
+
+```
+070b75b Merge pull request #44 from mercyblitz/dev-1.x
+6714c69 Fix global filter lookup in caching handler
+2fad114 Bump Microsphere Spring Cloud to 0.1.25
+fe959e0 chore: merge release-1.x into dev-1.x [skip ci]
+791f6ba chore: bump version to next patch after publishing 0.1.16
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.1.16...0.1.17
