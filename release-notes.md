@@ -247,4 +247,20 @@ For a complete list of changes, refer to the [Full Changelog](https://github.com
 
 **Note:** These changes aim to enhance module configuration, testing, and maintainability across the project.
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.14...0.2.15
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.14...0.2.15## v0.2.16
+
+# Release Notes - Version 0.2.16
+
+## New Features
+- **Gateway Module**: Mark gateway module dependencies as optional.  
+- **Spring Cloud Commons**: Add optional `spring-cloud-commons` dependencies.  
+
+## Dependency Updates
+- Upgraded `microsphere-spring-cloud` to version `0.2.24`.
+
+## Build and Workflow Enhancements
+- Merged updates from `main` into `release`. *(No functional changes, [skip ci])*  
+
+---
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.15...0.2.16
