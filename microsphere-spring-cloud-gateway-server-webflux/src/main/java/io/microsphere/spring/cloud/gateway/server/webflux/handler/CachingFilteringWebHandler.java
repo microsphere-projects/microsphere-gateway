@@ -119,6 +119,6 @@ public class CachingFilteringWebHandler extends FilteringWebHandler implements D
     }
 
     private List<GatewayFilter> globalFilters() {
-        return getFieldValue(this, "globalFilters");
+        return getFieldValue(true, this, "globalFilters");
     }
 }
