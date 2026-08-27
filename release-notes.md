@@ -263,4 +263,17 @@ For a complete list of changes, refer to the [Full Changelog](https://github.com
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.15...0.2.16
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.15...0.2.16## v0.2.17
+
+_Release notes generation failed. Raw commits since 0.2.16:_
+
+```
+f6c2fad chore: merge main into release [skip ci]
+ad5fa8e Fix global filter lookup in webflux handler
+16f76e1 chore: merge main into release [skip ci]
+84f1c76 Bump microsphere-spring-cloud to 0.2.25
+6606657 chore: merge release into main [skip ci]
+1ad0b8a chore: bump version to next patch after publishing 0.2.16
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.16...0.2.17
