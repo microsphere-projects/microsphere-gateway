@@ -240,4 +240,16 @@ fe959e0 chore: merge release-1.x into dev-1.x [skip ci]
 791f6ba chore: bump version to next patch after publishing 0.1.16
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.1.16...0.1.17
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.1.16...0.1.17## v0.1.18
+
+_Release notes generation failed. Raw commits since 0.1.17:_
+
+```
+e8ffe75 Merge pull request #46 from mercyblitz/dev-1.x
+55d09ab Bump parent and BOM versions to 0.1.26
+bfc3faa Add workflow to sync branches from upstream repository
+e06c74b chore: merge release-1.x into dev-1.x [skip ci]
+926d377 chore: bump version to next patch after publishing 0.1.17
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.1.17...0.1.18
