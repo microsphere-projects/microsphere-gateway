@@ -276,4 +276,20 @@ ad5fa8e Fix global filter lookup in webflux handler
 1ad0b8a chore: bump version to next patch after publishing 0.2.16
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.16...0.2.17
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.16...0.2.17## v0.2.18
+
+_Release notes generation failed. Raw commits since 0.2.17:_
+
+```
+c83a1de chore: merge main into release [skip ci]
+7fad564 Update microsphere-spring-cloud version to 0.2.26
+a9ac602 chore: merge main into release [skip ci]
+ec84906 Update version to 0.2.26 in pom.xml
+d452447 chore: merge main into release [skip ci]
+52479ba Merge pull request #45 from microsphere-projects/dependabot/maven/org.apache.maven-apache-maven-3.9.16
+5f13a3e Bump org.apache.maven:apache-maven from 3.9.15 to 3.9.16
+0fcd22b chore: merge release into main [skip ci]
+ccd199b chore: bump version to next patch after publishing 0.2.17
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-gateway/compare/0.2.17...0.2.18
