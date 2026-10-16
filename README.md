@@ -158,6 +158,43 @@ This project is maintained by the [Microsphere organization](https://github.com/
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 - Follow the community expectations in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
+## Reporting Issues
+
+* Before you log a bug, please search
+  the [issues](https://github.com/microsphere-projects/microsphere-gateway/issues)
+  to see if someone has already reported the problem.
+* If the issue doesn't already
+  exist, [create a new issue](https://github.com/microsphere-projects/microsphere-gateway/issues/new).
+* Please provide as much information as possible with the issue report.
+
+## Documentation
+
+### Guides
+
+The guides describe the released lines only: the `release` branch (`0.2.x`) and the `release-1.x` branch (`0.1.x`).
+They are available in English (default) and Chinese; start at the [documentation index](docs/README.md)
+or its [中文入口](docs/zh/README.md).
+
+| Version line | User Guide | Developer Guide |
+|--------------|------------|-----------------|
+| `release` / `0.2.x` | [User Guide](docs/current/user-guide/README.md) | [Developer Guide](docs/current/developer-guide/README.md) |
+| `release-1.x` / `0.1.x` | [User Guide](docs/1.x/user-guide/README.md) | [Developer Guide](docs/1.x/developer-guide/README.md) |
+
+### User Guide
+
+[DeepWiki Host](https://deepwiki.com/microsphere-projects/microsphere-gateway)
+
+[ZRead Host](https://zread.ai/microsphere-projects/microsphere-gateway)
+
+### Wiki
+
+[Github Host](https://github.com/microsphere-projects/microsphere-gateway/wiki)
+
+### JavaDoc
+
+- [microsphere-spring-cloud-gateway-server-webflux](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webflux)
+- [microsphere-spring-cloud-gateway-server-webmvc](https://javadoc.io/doc/io.github.microsphere-projects/microsphere-spring-cloud-gateway-server-webmvc)
+
 ## License
 
 Distributed under the [Apache License 2.0](LICENSE).
