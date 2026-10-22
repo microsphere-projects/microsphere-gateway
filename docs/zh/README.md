@@ -37,6 +37,16 @@ Web 端点路由方案、基于服务发现的动态路由以及路由刷新能�
 | `microsphere-spring-cloud-gateway-server-webflux.md` | 运行时 | 自动配置、`we://` 路由、过滤器链、路由缓存、刷新事件 |
 | `microsphere-spring-cloud-gateway-server-webmvc.md` | 运行时 | 基于 Servlet 的网关集成（仅 `0.2.x`） |
 
+## 两个最新 tag 的源码对比
+
+对两条版本线的最新发布 tag（`0.2.18` vs `0.1.18`）按 Maven 模块做文件级对比，`src/main` 与 `src/test` 分开；
+排除 Java 8/17 语法差异与 Java EE/Jakarta EE 差异，并对剩余差异逐条标注成因（API 兼容、功能覆盖等）：
+
+| 文档 | 范围 | English |
+|---|---|---|
+| [main-diff-0.2.18-vs-0.1.18.zh.md](../diff/source/main-diff-0.2.18-vs-0.1.18.zh.md) | 匹配模块的 `src/main` | [English](../diff/source/main-diff-0.2.18-vs-0.1.18.md) |
+| [test-diff-0.2.18-vs-0.1.18.zh.md](../diff/source/test-diff-0.2.18-vs-0.1.18.zh.md) | 匹配模块的 `src/test` | [English](../diff/source/test-diff-0.2.18-vs-0.1.18.md) |
+
 ## 模块之间的关系
 
 ```mermaid
