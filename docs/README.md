@@ -39,6 +39,17 @@ Each guide carries one document per Maven module, plus this index pattern:
 | `microsphere-spring-cloud-gateway-server-webflux.md` | Runtime | Auto-configuration, `we://` routing, filter chain, route caching, refresh events |
 | `microsphere-spring-cloud-gateway-server-webmvc.md` | Runtime | Servlet-based gateway integration (`0.2.x` only) |
 
+## Source diffs between tags
+
+File-level comparisons of the newest release tags of both lines (`0.2.18` vs `0.1.18`), per Maven module, split by
+`src/main` and `src/test`, with Java 8/17 syntax and Java EE/Jakarta EE differences excluded and each remaining
+difference attributed to a cause (API compatibility, feature coverage, …):
+
+| Document | Scope | 中文 |
+|---|---|---|
+| [main-diff-0.2.18-vs-0.1.18.md](diff/source/main-diff-0.2.18-vs-0.1.18.md) | `src/main` of matched modules | [中文版](diff/source/main-diff-0.2.18-vs-0.1.18.zh.md) |
+| [test-diff-0.2.18-vs-0.1.18.md](diff/source/test-diff-0.2.18-vs-0.1.18.md) | `src/test` of matched modules | [中文版](diff/source/test-diff-0.2.18-vs-0.1.18.zh.md) |
+
 ## How the modules fit together
 
 ```mermaid
